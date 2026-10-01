@@ -1,0 +1,1294 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   EaLearn Design System v5
+   Logo-derived identity: navy #1b3663 / blue #317ad8 / amber #f6c24a.
+   WCAG AA contrast (verified, see .shot-tmp/check-contrast.mjs),
+   44px touch targets, Outfit + Inter type pairing, defined z-index scale.
+   ========================================================================== */
+
+:root {
+  /* ── Brand ──────────────────────────────────────────────────────────
+     Two tiers per hue:
+       *-soft  = surface / fill (large areas, never carries body text)
+       *-ink   = accessible text/icon colour (>= 4.5:1 on --bg / --card)
+     v3 used one value for both, which is why --text-muted sat at 2.75:1
+     and --accent at 2.08:1 — both unreadable as text.
+
+     Palette note: the logo's own blue #317ad8 is 4.28:1 on white, which fails
+     AA for the 14px bold label inside .btn-primary. So --primary is the brand
+     blue pushed one step deeper (#2a63b8, 5.87:1) and #317ad8 survives as the
+     decorative --brand-blue for gradients. The logo navy is --primary-ink.
+  */
+  --primary: #2a63b8;
+  --primary-dark: #1f4f96;
+  --primary-light: #7fb0ec;
+  --primary-soft: #e6f0fc;
+  --primary-ink: #1b3663;
+
+  --brand-blue: #317ad8;
+  --brand-navy: #1b3663;
+  --brand-amber: #f6c24a;
+
+  --accent: #f6c24a;
+  --accent-dark: #d9a233;
+  --accent-soft: #fdf3e0;
+  --accent-ink: #8a6313;
+
+  /* Teal, so "info" does not read as a second brand blue. */
+  --info: #1f7a8c;
+  --info-soft: #e0f2f5;
+  --info-ink: #14586a;
+
+  --warning: #e08a2e;
+  --warning-soft: #fdf0dc;
+  --warning-ink: #8a5310;
+
+  --danger: #c0392f;
+  --danger-dark: #9d2c24;
+  --danger-soft: #fce9e7;
+  --danger-ink: #8f2a22;
+
+  /* Deliberately green and NOT the brand colour: "Benar" must be
+     distinguishable from the primary action, and a kid scanning a quiz page
+     should not have to wonder whether green means brand or correct. */
+  --success: #1f7a4a;
+  --success-soft: #e4f4ec;
+  --success-ink: #1a6840;
+
+  /* ── Surfaces ───────────────────────────────────────────────────
+     Cooled off cream. The old warm #f7f9fc was tuned for a sage brand and
+     made every new blue surface look muddy against it. */
+  --bg: #f7f9fc;
+  --bg-soft: #eef2f8;
+  --bg-pure: #ffffff;
+  --card: #ffffff;
+  --card-soft: #f6f9fd;
+  --card-tint: #eaf1fa;
+
+  /* ── Text ──────────────────────────────────────────────────────── */
+  --text: #16202e;
+  --text-soft: #48566a;
+  --text-muted: #5d6b7f;
+
+  /* ── Lines ─────────────────────────────────────────────────────── */
+  --border: #bcc8db;
+  --border-soft: #e6ecf4;
+
+  /* ── Shape ─────────────────────────────────────────────────────── */
+  --radius-sm: 10px;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+
+  /* Layered, low-alpha shadows read as depth. The base is now a cool navy
+     matching --text, so surfaces sit on the same hue as the palette instead
+     of the brown cast v3 carried. */
+  --shadow-xs: 0 1px 2px rgba(22, 32, 46, 0.05);
+  --shadow-sm: 0 1px 3px rgba(22, 32, 46, 0.06), 0 1px 2px rgba(22, 32, 46, 0.04);
+  --shadow: 0 4px 12px rgba(22, 32, 46, 0.07), 0 1px 3px rgba(22, 32, 46, 0.05);
+  --shadow-lg: 0 12px 32px rgba(22, 32, 46, 0.1), 0 2px 8px rgba(22, 32, 46, 0.06);
+  --shadow-glow: 0 0 0 4px rgba(42, 99, 184, 0.18);
+
+  /* Focus ring (a11y) */
+  --focus-ring: 0 0 0 3px rgba(49, 122, 216, 0.4);
+
+  /* ── Z-index scale (v3 used 5 / 10 / 1000 at random) ───────────── */
+  --z-base: 1;
+  --z-sticky: 10;
+  --z-dropdown: 20;
+  --z-modal: 30;
+  --z-toast: 50;
+
+  /* ── Type scale ──────────────────────────────────────────────────
+     v3 bottomed out at 11px with a 14px body. Body is now 15px and the
+     floor is 12px, which clears legibility on low-DPI phones.
+  */
+  --fs-xs: 12px;
+  --fs-sm: 13.5px;
+  --fs-md: 15px;
+  --fs-lg: 17px;
+  --fs-xl: 19px;
+  --fs-2xl: 23px;
+  --fs-3xl: 29px;
+  --fs-4xl: 37px;
+  --fs-5xl: 48px;
+
+  /* Named *-stack so @theme can reference them without shadowing the
+     :root definition. Writing `@theme inline { --font-sans: var(--font-sans) }`
+     looks equivalent but is a cycle: Tailwind re-emits the @theme value into
+     :root, the variable resolves to itself, and font-family silently falls
+     back to the browser default. The body rendered in Segoe UI that way
+     while --font-display kept working. */
+  --font-inter-stack: var(--font-inter), ui-sans-serif, system-ui,
+    -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display-stack: var(--font-outfit), var(--font-inter-stack);
+  --font-sans: var(--font-inter-stack);
+  --font-display: var(--font-display-stack);
+
+  /* ── Spacing ───────────────────────────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* ── Touch target (WCAG 2.5.5 / skill min 44x44) ───────────────── */
+  --tap: 44px;
+
+  /* ── Layout ────────────────────────────────────────────────────── */
+  --shell-max: 480px;
+  --shell-wide: 1200px;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-soft: var(--bg-soft);
+  --color-card: var(--card);
+  --color-card-soft: var(--card-soft);
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-light: var(--primary-light);
+  --color-accent: var(--accent);
+  --color-accent-dark: var(--accent-dark);
+  --color-text: var(--text);
+  --color-text-soft: var(--text-soft);
+  --color-text-muted: var(--text-muted);
+  --color-border: var(--border);
+  --color-border-soft: var(--border-soft);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-inter-stack);
+  --font-display: var(--font-display-stack);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+  font-size: var(--fs-md);
+  line-height: 1.55;
+  /* Keeps the sticky bottom nav from hiding the last row of content. */
+  scroll-padding-bottom: 80px;
+}
+
+/* v4 bugfix — the page background lived on <body> and that killed every
+   `.bg-aurora` layer in the app.
+
+   `.bg-aurora` is `position: fixed; inset: 0; z-index: -1`. In the root
+   stacking context, negative z-index descendants paint BEFORE the in-flow
+   block backgrounds of html/body. An opaque `body { background: --bg }`
+   therefore paints straight over the aurora and hides it completely.
+
+   That was invisible everywhere except on the dark-background pages
+   (/quiz/[id]/share and all of /play/*), where white text sat on cream —
+   "Kuis siap dishare!" and the whole kid-facing quiz header were unreadable.
+
+   The fix: keep `--bg` on <html> (the root element's background propagates to
+   the canvas, so it stays a safe fallback for any page without an aurora) and
+   leave <body> transparent so the aurora layer is not overpainted. */
+html {
+  background: var(--bg);
+}
+body {
+  background: transparent;
+}
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+input, textarea, select { font-family: inherit; }
+
+/* ==========================================================================
+   ACCESSIBILITY
+   ========================================================================== */
+
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Keyboard users get the ring; mouse users don't see a stuck outline. */
+.form-control:focus-visible {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: var(--focus-ring);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* v3 had no reduced-motion block at all, yet the page ships four infinite
+   animations (floaty x3 float-cards, skeleton shimmer, FAB pulse). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .float-card,
+  .animate-floaty,
+  .skeleton {
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   TYPOGRAPHY
+   ========================================================================== */
+
+.h-display {
+  font-family: var(--font-display);
+  font-size: var(--fs-4xl);
+  font-weight: 700;
+  line-height: 1.08;
+  color: var(--text);
+  letter-spacing: -0.025em;
+  margin: 0 0 var(--space-3);
+}
+.h-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  line-height: 1.22;
+  color: var(--text);
+  letter-spacing: -0.015em;
+  margin: 0 0 var(--space-2);
+}
+.h-section {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin: 0 0 var(--space-2);
+}
+.t-muted {
+  color: var(--text-soft);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+}
+.t-soft {
+  color: var(--text-muted);
+  font-size: var(--fs-xs);
+}
+
+/* ==========================================================================
+   LAYOUTS — responsive helpers
+   ========================================================================== */
+
+/* Shells stay transparent so the fixed `.bg-aurora` layer behind them is
+   actually visible. An opaque shell background repaints over the
+   `z-index: -1` aurora, which is what hid every dark page. Pages without an
+   aurora still get `--bg` from the <html> canvas. */
+.shell-mobile {
+  width: 100%;
+  max-width: var(--shell-max);
+  margin: 0 auto;
+  background: transparent;
+  min-height: 100vh;
+  position: relative;
+}
+.shell-mobile-full {
+  width: 100%;
+  max-width: var(--shell-max);
+  margin: 0 auto;
+  background: transparent;
+  min-height: 100vh;
+}
+@media (min-width: 768px) {
+  .shell-mobile,
+  .shell-mobile-full {
+    max-width: var(--shell-wide);
+  }
+}
+
+/* Login / signup — one centred column.
+
+   Replaces the .split-screen pair. The hero column was decorative weight: on a
+   phone it stacked above the form, pushing the fields a full screen down, and
+   it gave floating toasts a dark gradient to land on. Both are gone, so these
+   names are retired rather than left behind as an unused trap. */
+.auth-centered {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-6) var(--space-5);
+}
+.auth-centered__inner {
+  width: 100%;
+  max-width: 400px;
+}
+
+.wide-shell {
+  width: 100%;
+  max-width: var(--shell-wide);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5);
+}
+
+/* ==========================================================================
+   BUTTONS
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  /* v3 forced width:100% at every breakpoint, so a desktop button stretched
+     the full column. Full-width only makes sense on a phone. */
+  width: 100%;
+  padding: 14px var(--space-5);
+  min-height: var(--tap);
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: var(--fs-md);
+  /* Colour + shadow only. The v3 translateY(-1px) nudged the button and
+     everything under it on hover. */
+  transition: background-color 0.2s ease, color 0.2s ease,
+    border-color 0.2s ease, box-shadow 0.2s ease;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  position: relative;
+  text-decoration: none;
+}
+@media (min-width: 768px) {
+  .btn { width: auto; min-width: 180px; }
+  .btn-block { width: 100%; }
+}
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(34, 33, 29, 0.08), 0 4px 12px rgba(42, 99, 184, 0.26);
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-dark);
+  box-shadow: 0 2px 4px rgba(34, 33, 29, 0.1), 0 8px 20px rgba(27, 54, 99, 0.24);
+}
+.btn-outline {
+  background: transparent;
+  color: var(--primary-ink);
+  border: 1.5px solid var(--primary);
+}
+.btn-outline:hover:not(:disabled) {
+  background: var(--primary-soft);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--text-soft);
+}
+.btn-ghost:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--bg-soft);
+}
+.btn-accent {
+  background: var(--accent);
+  color: var(--text);
+}
+.btn-accent:hover:not(:disabled) {
+  background: var(--accent-dark);
+  color: #fff;
+}
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+}
+.btn-sm {
+  padding: var(--space-2) 16px;
+  min-height: 36px;
+  font-size: var(--fs-sm);
+  border-radius: var(--radius-sm);
+}
+.btn-pill {
+  border-radius: var(--radius-pill);
+}
+
+.btn-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   FORM
+   ========================================================================== */
+
+.form-group { margin-bottom: var(--space-4); }
+.form-group label {
+  display: block;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--space-2);
+}
+.form-control {
+  width: 100%;
+  padding: 12px var(--space-4);
+  min-height: var(--tap);
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: var(--fs-md);
+  color: var(--text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+}
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: var(--focus-ring);
+}
+.form-control::placeholder { color: var(--text-muted); opacity: 1; }
+.form-control:disabled { background: var(--bg-soft); cursor: not-allowed; }
+.form-control[aria-invalid="true"] { border-color: var(--danger); }
+
+textarea.form-control { resize: vertical; min-height: 96px; line-height: 1.55; }
+
+.input-error {
+  font-size: var(--fs-sm);
+  color: var(--danger-ink);
+  margin-top: var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.input-search-wrap { position: relative; }
+.input-search-wrap i {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+.input-search-wrap .form-control { padding-left: 40px; }
+
+/* ==========================================================================
+   CARDS
+   ========================================================================== */
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  /* v3 moved the card on hover; depth comes from the shadow alone now. */
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.card-clickable { cursor: pointer; }
+.card-clickable:hover {
+  box-shadow: var(--shadow);
+  border-color: var(--primary-light);
+}
+.card-soft {
+  background: var(--card-soft);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  border: 1px solid var(--border-soft);
+}
+.card-flat {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+}
+
+/* Bento grid for dashboard */
+.bento {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .bento {
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: minmax(80px, auto);
+  }
+  .bento-wide { grid-column: span 2; }
+  .bento-full { grid-column: span 4; }
+}
+
+/* ==========================================================================
+   EMPTY STATE
+   ========================================================================== */
+
+.empty-state {
+  text-align: center;
+  padding: 48px var(--space-6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.empty-state-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--primary-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-4);
+  color: var(--primary-ink);
+}
+.empty-state-icon svg { width: 32px; height: 32px; }
+
+/* ==========================================================================
+   AUTH PAGES (any single-column form screen)
+
+   Both classes were referenced by the now-removed /reset-password screens
+   but had NO rule here at all. An undefined class is just a bare <div>, so
+   those two screens rendered with no padding, no max-width and no centering —
+   the form ran off the right edge of the screen and the "← Kembali" link sat
+   on the same line as the logo (see .brand-logo below).
+   ========================================================================== */
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6) var(--space-4);
+}
+.auth-page-content {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Small square icon button (editor row actions: close, delete). */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-soft);
+  color: var(--text-soft);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.btn-icon:hover { background: var(--border-soft); color: var(--text); }
+
+/* Loading placeholder lines — a heading-width bar over two body-width bars. */
+.skeleton-text { height: 14px; margin-bottom: 10px; }
+.skeleton-text.lg { height: 22px; width: 45%; margin-bottom: 18px; }
+.skeleton-text.md { width: 100%; }
+
+/* Hairline divider between the hero trust points ("Gratis selamanya" etc).
+   Hidden by default because on a phone the three items wrap onto a second
+   line, where a leading divider hangs at the start of the row looking like a
+   stray mark. Shown only once they comfortably fit on one line. */
+.trust-sep { display: none; }
+@media (min-width: 520px) {
+  .trust-sep {
+    display: block;
+    width: 1px;
+    height: 14px;
+    background: var(--border);
+  }
+}
+
+/* ==========================================================================
+   LANDING PAGE — phone compression
+
+   Measured at 390x844 the landing page was 2509px (2.97 screens of scroll).
+   The hero alone was 525px because the 37px headline wrapped to four lines and
+   the paragraph ran to five, so two thirds of the first screen went to the
+   pitch before a single actionable thing appeared. The "Cara pakai" block was
+   worse at 821px — four cards, each forced to a full-width row by a 180px
+   minmax at a 358px content width.
+
+   These rules keep the desktop composition untouched and only compress the
+   phone.
+   ========================================================================== */
+
+.landing-hero__title {
+  /* 37px on desktop, 26px on a 360px phone. */
+  font-size: clamp(26px, 7.2vw, 37px);
+  line-height: 1.16;
+  margin-bottom: 12px;
+}
+.landing-hero__sub {
+  font-size: clamp(14px, 3.7vw, 16px);
+  line-height: 1.55;
+  margin: 0 auto 20px;
+  max-width: 540px;
+}
+/* The forced <br> between the two headline halves is useful on a wide screen
+   and pure waste on a phone, where the text already wraps on its own. */
+.landing-hero__break { display: none; }
+@media (min-width: 640px) {
+  .landing-hero__break { display: inline; }
+}
+
+/* Four steps: 2x2 on a phone instead of four stacked rows. */
+.landing-steps {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+@media (min-width: 768px) {
+  .landing-steps {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+}
+.landing-step {
+  padding: 12px;
+  position: relative;
+  text-align: left;
+}
+@media (min-width: 768px) {
+  .landing-step { padding: 16px; }
+}
+/* Decorative only — the numbered circle already reads as "step N". */
+.landing-step__icon { display: none; }
+@media (min-width: 768px) {
+  .landing-step__icon { display: flex; }
+}
+.landing-step__num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+@media (min-width: 768px) {
+  .landing-step__num {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+}
+
+/* Tighter section rhythm on phones; the 48/32 desktop rhythm was generous. */
+.landing-section { margin-top: 28px; margin-bottom: 20px; }
+@media (min-width: 768px) {
+  .landing-section { margin-top: 48px; margin-bottom: 32px; }
+}
+
+/* ==========================================================================
+   BRAND & LOGOS
+   ========================================================================== */
+
+/* Was display: inline-flex. Inside a flex parent the browser blockifies it
+   anyway, so this only ever mattered in block parents — where it flowed onto
+   the same line as any preceding inline content, which is how the logo ended
+   up printed on top of the "← Kembali" link on the old reset-password screen.
+   `flex` keeps every existing usage visually identical and fixes the block
+   ones. */
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-xl);
+  letter-spacing: -0.02em;
+  color: var(--primary-dark);
+}
+/* The real logo artwork. `.logo-mark` used to be a gradient tile with a
+   letter "E" typed into it — a placeholder that predated any brand asset. The
+   mark is a transparent-captain-book glyph, so it is dropped straight in
+   without the old tile background or the text-coloured glow, both of which
+   were faking a logo the app never had.
+
+   The mark is wide-ish, so the box is square and the image is centred with
+   object-fit: contain rather than cropped. */
+.brand-logo .logo-mark {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.brand-logo .logo-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Inverted-on-dark contexts: the navy cap disappears against a dark panel, so
+   the artwork is dropped onto a light rounded plate. Only used where the
+   surrounding surface is dark. */
+.brand-logo-on-dark .logo-mark {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 10px;
+  padding: 3px;
+}
+
+/* ==========================================================================
+   LINKS + ALERTS + BADGES
+   ========================================================================== */
+
+/* Inline links ("Belum punya akun? Daftar gratis") sit inside a sentence, so
+   they render at text size — measured at 16px tall, well under the 44px touch
+   minimum, and this app is used on phones.
+
+   The padding grows the hit area to ~36px without moving anything: the negative
+   margin cancels the padding back out, so the line keeps its original spacing
+   and only the tappable region gets bigger. */
+.text-link {
+  color: var(--primary-ink);
+  font-weight: 600;
+  font-size: var(--fs-sm);
+  text-decoration: none;
+  display: inline-block;
+  padding: 10px 2px;
+  margin: -10px -2px;
+}
+.text-link:hover { text-decoration: underline; }
+
+.alert {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius);
+  font-size: var(--fs-sm);
+  margin-bottom: var(--space-4);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  line-height: 1.5;
+}
+.alert-error { background: var(--danger-soft); color: var(--danger-ink); border: 1px solid #eec7c1; }
+.alert-success { background: var(--success-soft); color: var(--success-ink); border: 1px solid #cfe0c0; }
+.alert-info { background: var(--primary-soft); color: var(--primary-ink); border: 1px solid var(--primary-light); }
+.alert-warning { background: var(--warning-soft); color: var(--warning-ink); border: 1px solid #ecd5b0; }
+
+.t-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  padding: 3px var(--space-2);
+  border-radius: 6px;
+  background: var(--bg-soft);
+  color: var(--text-soft);
+  white-space: nowrap;
+}
+.t-tag.success { background: var(--success-soft); color: var(--success-ink); }
+.t-tag.warning { background: var(--warning-soft); color: var(--warning-ink); }
+.t-tag.danger { background: var(--danger-soft); color: var(--danger-ink); }
+.t-tag.primary { background: var(--primary-soft); color: var(--primary-ink); }
+.t-tag.accent { background: var(--accent-soft); color: var(--accent-ink); }
+.t-tag.info { background: var(--info-soft); color: var(--info-ink); }
+
+/* ==========================================================================
+   NAVIGATION
+   Mobile: sticky bottom bar. Desktop (>=768px): a real top bar — a
+   4-column bottom bar stretched across 1200px was the single most
+   dated-looking thing in v3.
+   ========================================================================== */
+
+.bottom-nav {
+  position: sticky;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border-soft);
+  display: flex;
+  padding: 6px 0 max(6px, env(safe-area-inset-bottom));
+  z-index: var(--z-sticky);
+}
+.bottom-nav .nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: var(--text-muted);
+  /* v3 was 10px; 12px is the floor for icon-adjacent labels. */
+  font-size: 12px;
+  font-weight: 500;
+  /* 44px min height per WCAG 2.5.5, up from ~34px. */
+  min-height: var(--tap);
+  padding: 6px 4px;
+  text-decoration: none;
+  transition: color 0.15s ease, background-color 0.15s ease;
+  border-radius: var(--radius-sm);
+}
+.bottom-nav .nav-item .nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+.bottom-nav .nav-item .nav-icon svg { width: 22px; height: 22px; }
+.bottom-nav .nav-item:hover {
+  color: var(--text-soft);
+  background: var(--bg-soft);
+}
+.bottom-nav .nav-item.active {
+  color: var(--primary-ink);
+  font-weight: 600;
+}
+
+@media (min-width: 768px) {
+  .bottom-nav {
+    position: sticky;
+    top: 0;
+    bottom: auto;
+    flex-direction: row;
+    justify-content: center;
+    gap: var(--space-2);
+    border-top: none;
+    border-bottom: 1px solid var(--border-soft);
+    padding: var(--space-2) var(--space-5);
+  }
+  .bottom-nav .nav-item {
+    flex: 0 0 auto;
+    flex-direction: row;
+    gap: var(--space-2);
+    padding: 10px var(--space-4);
+    min-height: 40px;
+    font-size: var(--fs-sm);
+  }
+  .bottom-nav .nav-item.active {
+    background: var(--primary-soft);
+  }
+}
+
+/* ==========================================================================
+   DESKTOP LAYOUT (≥1024px)
+
+   v4 shipped a phone layout and widened the shell to 1200px, which is where
+   the trouble started:
+
+   1. `.bottom-nav` is rendered AFTER <main> so it can sit at the bottom on
+      phones. Its desktop rule was `position: sticky; top: 0`, but a sticky
+      element only pins once it reaches the top of the scroll — so on a
+      dashboard with a long quiz list the navigation was stranded ~2000px
+      down and you only found it after scrolling to the very end. Flex
+      `order` lifts it to the top without moving the markup, so phones keep
+      the bottom bar exactly as before.
+   2. Stacked list rows read fine at 480px but became 58px-tall ribbons
+      stretched across 1170px, so a dozen drafts meant a very long thin scroll.
+   3. 1200px of content inside a 1920px viewport wasted 360px per side.
+   4. The FAB duplicated the "Buat Kuis" item already in the nav — its
+      `display: none` lives next to the base .fab rule, not here, because a
+      media query carries no specificity.
+   ========================================================================== */
+
+@media (min-width: 1024px) {
+  /* (1) Nav belongs at the top of the column, not the bottom. */
+  .bottom-nav {
+    order: -1;
+    /* Opaque, unlike the frosted phone bar. Once the nav sits at the top, the
+       page header and page content slide underneath it on every scroll; at 88%
+       white they showed through and the whole bar looked smeared. A solid app
+       bar is also just what a desktop app should look like. */
+    background: var(--bg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  /* The nav now owns `top: 0` — see the `position: static` override next to
+     the base .page-header rule further down, which is where it has to live to
+     win on source order. */
+  .page-header {
+    min-height: 64px;
+    padding: var(--space-3) var(--space-6);
+  }
+  .page-header h1 { font-size: 18px; }
+}
+
+/* (3) Give large screens more canvas. */
+@media (min-width: 1280px) {
+  .shell-mobile,
+  .shell-mobile-full { max-width: 1400px; }
+}
+
+/* (2) Responsive list grid — stacked on phones, tiles on desktop. */
+.list-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+@media (min-width: 768px) {
+  .list-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 12px;
+  }
+}
+
+/* ==========================================================================
+   TOAST NOTIFICATIONS
+   ========================================================================== */
+
+.toast-container {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: calc(100% - 32px);
+  max-width: var(--shell-max);
+  pointer-events: none;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow-lg);
+  font-size: var(--fs-sm);
+  pointer-events: auto;
+  animation: slideDown 0.3s ease-out;
+}
+.toast-success { border-left: 4px solid var(--success); }
+.toast-error { border-left: 4px solid var(--danger); }
+.toast-info { border-left: 4px solid var(--info); }
+.toast-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.toast-icon svg { width: 13px; height: 13px; }
+.toast-success .toast-icon { background: var(--success-soft); color: var(--success-ink); }
+.toast-error .toast-icon { background: var(--danger-soft); color: var(--danger-ink); }
+.toast-info .toast-icon { background: var(--info-soft); color: var(--info-ink); }
+.toast-message { flex: 1; color: var(--text); }
+.toast-close {
+  background: transparent;
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+.toast-close svg { width: 14px; height: 14px; }
+.toast-close:hover { color: var(--text); background: var(--bg-soft); }
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   PAGE HEADER (sticky)
+   ========================================================================== */
+
+.page-header {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 10px var(--space-5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-soft);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  min-height: 60px;
+}
+
+/* Desktop: the nav has taken over the pinned top slot, so the header must
+   stop being sticky too. Both were `position: sticky; top: 0` and therefore
+   pinned to the same offset — measured 60px of overlap, with "Dashboard" and
+   "Keluar" bleeding through the nav on every scroll. Letting the header scroll
+   away keeps the nav as the single persistent bar, and it stays correct on
+   pages with no nav at all (/profile, /quiz/[id], /quiz/new), where offsetting
+   the header to sit under the nav would leave a permanent 60px hole.
+   This override MUST stay after the base rule above: a media query adds no
+   specificity, so an earlier `position: static` loses to this `position:
+   sticky` (same trap as `.fab` below). */
+@media (min-width: 1024px) {
+  .page-header { position: static; }
+}
+.page-header h1 {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+.page-header .back,
+.page-header .action {
+  /* 36px in v3 — under the 44px minimum. */
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease;
+}
+.page-header .back:hover,
+.page-header .action:hover { background: var(--bg-soft); }
+.page-header .back svg,
+.page-header .action svg { width: 20px; height: 20px; }
+
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.animate-fade-in { animation: fadeIn 0.4s ease-out; }
+.animate-slide-up { animation: slideUp 0.4s ease-out; }
+.animate-floaty { animation: floaty 3s ease-in-out infinite; }
+
+/* ==========================================================================
+   FLOATING ACTION BUTTON
+   ========================================================================== */
+
+.fab {
+  position: fixed;
+  bottom: calc(var(--tap) + 44px);
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(34, 33, 29, 0.12), 0 8px 24px rgba(125, 84, 38, 0.22);
+  text-decoration: none;
+  z-index: var(--z-sticky);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+.fab svg { width: 24px; height: 24px; }
+.fab:hover {
+  transform: translateY(-2px);
+  background: var(--accent-dark);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(34, 33, 29, 0.14), 0 12px 32px rgba(125, 84, 38, 0.3);
+}
+.fab:active { transform: translateY(0); }
+@media (max-width: 767px) {
+  .fab { bottom: calc(var(--tap) + 36px); right: 16px; }
+}
+/* On desktop the bottom nav became a top bar, so the FAB is free to sit
+   lower and stop colliding with it. */
+@media (min-width: 768px) {
+  .fab { bottom: 32px; right: 32px; }
+}
+/* From 1024px the nav sits across the top and already carries a "Buat Kuis"
+   item, so a second floating create button is just clutter on the same screen.
+   This has to live AFTER the base `.fab` rule above — a media query adds no
+   specificity, so an earlier `.fab { display: none }` would lose to the later
+   `.fab { display: flex }`. */
+@media (min-width: 1024px) {
+  .fab { display: none; }
+}
+
+/* ==========================================================================
+   PAGE-SPECIFIC BACKGROUNDS — differentiate pages visually
+   ========================================================================== */
+
+.bg-aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.bg-aurora-landing {
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 25%, rgba(246, 194, 74, 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 45% at 82% 18%, rgba(49, 122, 216, 0.2) 0%, transparent 58%),
+    radial-gradient(ellipse 70% 50% at 50% 100%, rgba(49, 122, 216, 0.1) 0%, transparent 60%),
+    linear-gradient(165deg, #f7f9fc 0%, #eef2f8 100%);
+}
+/* `.bg-aurora-auth` was removed with its last usage on /login. It was the one
+   dark page gradient, and it painted behind the light-themed form column,
+   leaving the labels, muted subtitle and green "Masuk" button on dark green.
+   The login screen has since lost its hero panel entirely and sits on the
+   plain --bg canvas, so there is nothing left for a dark gradient to serve. */
+.bg-aurora-dashboard {
+  background: linear-gradient(180deg, #f7f9fc 0%, #eef2f8 100%);
+}
+.bg-aurora-onboarding {
+  background: linear-gradient(135deg, #f7f9fc 0%, #e8f0e0 50%, #f7ead7 100%);
+}
+.bg-aurora-quiz {
+  background: linear-gradient(180deg, #f7f9fc 0%, #eaf1fa 100%);
+}
+.bg-aurora-share {
+  background: linear-gradient(135deg, #1b3663 0%, #2a63b8 100%);
+}
+
+/* Decorative radial "glow" veils.
+ *
+ * These sit inside `position: relative` content columns that are narrower than
+ * the viewport (max-width 1200px), so an unmasked radial-gradient gets sliced
+ * off mid-fade and paints a hard vertical edge down each side of the column.
+ * It was invisible while `.bg-aurora` was accidentally hidden behind the body
+ * background; once the aurora renders correctly the seams show up immediately.
+ *
+ * The mask forces the veil to reach full transparency before it reaches the
+ * container edge, at any viewport size, regardless of the gradient geometry. */
+.glow-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(ellipse 68% 68% at 50% 50%, #000 0%, transparent 100%);
+  mask-image: radial-gradient(ellipse 68% 68% at 50% 50%, #000 0%, transparent 100%);
+}
+
+/* Hero (landing) */
+.hero-pattern {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(49, 122, 216, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(246, 194, 74, 0.14) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Floating cards on landing */
+.float-card {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: 12px;
+  animation: floaty 4s ease-in-out infinite;
+}
+.float-card-1 {
+  top: 12%;
+  left: -10%;
+  animation-delay: 0s;
+}
+.float-card-2 {
+  top: 50%;
+  right: -8%;
+  animation-delay: 1s;
+}
+.float-card-3 {
+  bottom: 15%;
+  left: 5%;
+  animation-delay: 2s;
+}
+
+/* Wizard progress (onboarding) */
+.wizard-progress {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding: var(--space-4) var(--space-5);
+}
+.wizard-progress .step-dot {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  transition: background 0.2s ease;
+}
+.wizard-progress .step-dot.active { background: var(--primary); }
+.wizard-progress .step-dot.done { background: var(--primary-light); }
+
+/* `.qr-placeholder` was removed with the fake QR block on /quiz/[id]/share.
+   It was a decorative checkerboard with two fake finder squares captioned
+   "Scan QR atau copy link di bawah" — not a QR code, and it never encoded the
+   share link, so scanning it could only ever fail. If a real QR is wanted
+   later it needs an actual encoder (e.g. the `qrcode` package), never CSS. */
+
+/* SKELETON */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-soft) 0%, var(--border-soft) 50%, var(--bg-soft) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
