@@ -3,7 +3,7 @@
  * Wraps raw SQL with type-safe inputs/outputs.
  */
 
-import { allRows, getRow, runSql, cuid, now, type SQLInputValue } from "@/lib/db";
+import { allRows, getRow, runSql, cuid, shareToken, now, type SQLInputValue } from "@/lib/db";
 import {
   type UserRow,
   type ChildRow,
@@ -364,7 +364,7 @@ export async function createQuiz(data: {
   ageRange: AgeRange;
 }): Promise<QuizRow> {
   const id = cuid();
-  const shareUuid = cuid();
+  const shareUuid = shareToken();
   const nowIso = now();
   await runSql(
     `INSERT INTO quizzes (id, user_id, share_uuid, title, description, subject, age_range, status, created_at, updated_at)
@@ -775,6 +775,29 @@ export async function updateUserPassword(userId: string, passwordHash: string) {
     `UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?`,
     [passwordHash, now(), userId],
   );
+}
+
+/**
+ * Invalidate every session issued before this call.
+ *
+ * The session is a JWT, so changing password_hash does nothing to cookies that
+ * are already in the wild — they keep working until they expire, 30 days
+ * later. Bumping token_version makes the mismatch detectable: a token minted
+ * with the old number no longer matches the row, and lib/auth.ts treats the
+ * session as signed out.
+ *
+ * This is the "I think someone has my password" button actually working. With
+ * the bump removed, a parent could reset a leaked password and the thief would
+ * walk straight back in.
+ */
+export async function bumpTokenVersion(userId: string): Promise<number> {
+  const row = await getRow<{ token_version: number }>(
+    `UPDATE users SET token_version = token_version + 1, updated_at = ?
+     WHERE id = ?
+     RETURNING token_version`,
+    [now(), userId],
+  );
+  return Number(row?.token_version ?? 0);
 }
 
 // =====================================================

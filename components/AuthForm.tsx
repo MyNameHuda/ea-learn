@@ -134,7 +134,16 @@ export function AuthForm({
         // Land on the login screen with the email pre-filled, so the person
         // types one field instead of three. This one *is* worth a toast: it
         // confirms a state change they cannot otherwise see.
-        showToast("Akun dibuat. Silakan masuk.", "success");
+        //
+        // The wording is deliberately conditional. The server answers 201
+        // whether or not it actually created a row — it refuses to confirm
+        // that an address is taken, because an endpoint that does is a list of
+        // your users. So "Akun dibuat" would be a lie in the duplicate case;
+        // this sentence is true either way and tells them what to do next.
+        showToast(
+          "Akun dibuat. Kalau email ini sudah pernah dipakai, cukup masuk dengan passwordmu.",
+          "success",
+        );
         router.push(`/login?email=${encodeURIComponent(email.trim())}`);
         return;
       }
@@ -145,7 +154,13 @@ export function AuthForm({
         redirect: false,
       });
       if (res?.error) {
-        setErrors({ form: "Email atau password salah." });
+        // One message for two causes on purpose. The server rejects a wrong
+        // password and a rate-limited attempt identically, and it cannot say
+        // which without telling an attacker whether the address has an account
+        // here. So this wording covers both without confirming either.
+        setErrors({
+          form: "Email atau password salah — atau terlalu banyak percobaan dari perangkat ini. Coba lagi dalam 15 menit.",
+        });
         return;
       }
       router.push("/dashboard");

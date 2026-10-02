@@ -25,6 +25,7 @@ import { NextResponse } from "next/server";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { auth } from "@/lib/auth";
+import { hit, KEYS, LIMITS } from "@/lib/rate-limit";
 
 const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "questions");
@@ -72,6 +73,21 @@ export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ error: "Belum masuk." }, { status: 401 });
+  }
+
+  // Each accepted upload costs money and permanent storage at Cloudinary, so an
+  // open endpoint is a billing attack. Thirty an hour is more than a parent
+  // making question sheets will use and far less than a loop.
+  const budget = await hit(
+    KEYS.uploadUser(session.user.id),
+    LIMITS.upload.perUser,
+    LIMITS.upload.windowMs,
+  );
+  if (!budget.ok) {
+    return NextResponse.json(
+      { error: "Terlalu banyak upload. Coba lagi nanti." },
+      { status: 429, headers: { "Retry-After": String(budget.retryAfter) } },
+    );
   }
 
   // Reject on the claim before reading anything.

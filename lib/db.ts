@@ -29,6 +29,7 @@
  */
 
 import { Pool, types } from "pg";
+import { randomBytes, randomUUID } from "node:crypto";
 
 /**
  * Postgres returns int8 (OID 20) as a STRING, because 64-bit integers do not
@@ -158,6 +159,22 @@ const SCHEMA_SQL = `
   );
   CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 
+  -- Bumped every time the password changes. A JWT does not consult the
+  -- database, so without this a session issued before a password change stays
+  -- valid for its whole lifetime — which means a parent who resets a leaked
+  -- password cannot actually lock the thief out. See lib/auth.ts.
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS token_version INTEGER NOT NULL DEFAULT 0;
+
+  -- Rate limiting counters. Shared across every lambda instance, which an
+  -- in-memory Map could not be. expires_at is the instant the window closes,
+  -- not the instant it opened — see the note in lib/rate-limit.ts.
+  CREATE TABLE IF NOT EXISTS rate_limits (
+    key        TEXT PRIMARY KEY,
+    hits       INTEGER NOT NULL,
+    expires_at TEXT NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS idx_rate_limits_expires ON rate_limits(expires_at);
+
   CREATE TABLE IF NOT EXISTS user_settings (
     user_id          TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
     notify_email     INTEGER NOT NULL DEFAULT 1,
@@ -260,7 +277,19 @@ let schemaPromise: Promise<void> | null = null;
  */
 export function ensureSchema(): Promise<void> {
   if (!schemaPromise) {
-    schemaPromise = getPool().query(SCHEMA_SQL).then(() => undefined);
+    schemaPromise = getPool()
+      .query(SCHEMA_SQL)
+      // Counters whose window has closed can never be read again by `hit()` —
+      // it resets them on the next conflict — so they are pure garbage. Pruned
+      // once per process rather than per request: ensureSchema is memoised, so
+      // this runs on cold start, which is exactly as often as it needs to be.
+      .then(() => {
+        const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        return getPool().query(`DELETE FROM rate_limits WHERE expires_at < $1`, [
+          cutoff,
+        ]);
+      })
+      .then(() => undefined);
   }
   return schemaPromise;
 }
@@ -428,8 +457,34 @@ export async function transaction<T>(
 // Utility
 // ===========================
 
+/**
+ * An id for rows this app owns.
+ *
+ * The previous version was `"c" + Date.now().toString(36) + Math.random()…`,
+ * which is not a cuid and was never meant to be mistaken for one. It had two
+ * problems: `Math.random()` is xorshift128+, not a CSPRNG, so its output is
+ * derived from a recoverable 128-bit state rather than being unpredictable; and
+ * the timestamp prefix was readable straight out of the id, so holding one link
+ * told you when it was made. Neither is exploitable at 51.7 bits over the
+ * network, but row ids do not need to be secret and were paying for a
+ * generator that had to look like it was.
+ *
+ * `crypto.randomUUID()` is a CSPRNG draw and 122 bits besides, so the id
+ * length stops wobbling between 16 and 19 characters as well.
+ */
 export function cuid(): string {
-  return "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 12);
+  return randomUUID().replace(/-/g, "");
+}
+
+/**
+ * The secret half of a share link: /play/<token> is the only thing standing
+ * between a parent's quiz and anybody who has the URL, and the child who opens
+ * it has no account and no session. 32 bytes from the OS CSPRNG — 256 bits,
+ * which is not a number anyone brute-forces, and unlike the old id it carries
+ * no timestamp to read back.
+ */
+export function shareToken(): string {
+  return randomBytes(32).toString("base64url");
 }
 
 export function now(): string {

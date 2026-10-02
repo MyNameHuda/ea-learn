@@ -90,10 +90,19 @@ export function ChangePasswordForm() {
         return;
       }
       setDone(true);
-      showToast("Password berhasil diubah", "success");
+      // The server bumped token_version, which ends this session too — that is
+      // the whole point: a password reset has to log out whoever was holding
+      // the old cookie, including the person who just made the change. Say so
+      // before the redirect, or the login screen looks like a random bounce.
+      showToast("Password berhasil diubah. Silakan masuk lagi.", "success");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
+      // Long enough to read the toast, short enough that nobody is left
+      // staring at a page whose session has already been invalidated.
+      setTimeout(() => {
+        window.location.href = "/login?passwordChanged=1";
+      }, 1200);
     });
   }
 

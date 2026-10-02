@@ -14,7 +14,16 @@ import { getUserById, updateUserPassword } from "@/lib/queries/data";
  * The current password is required even though the caller is already signed in.
  * That is deliberate: it stops someone who briefly borrows an unlocked device
  * from quietly locking the owner out of their own account.
+ *
+ * Bumping token_version at the end is the other half. Requiring the current
+ * password proves *this* caller is the owner; it does nothing about a session
+ * cookie that is already in someone else's hands. Before the bump, a parent
+ * who reset a leaked password stayed logged in and so did the thief, both for
+ * the full 30 days. Now the reset ends every session, including this one.
  */
+
+import { clientIp, hit, KEYS, LIMITS } from "@/lib/rate-limit";
+import { bumpTokenVersion } from "@/lib/queries/data";
 
 const BCRYPT_ROUNDS = 10;
 
@@ -36,6 +45,22 @@ export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ error: "Belum masuk." }, { status: 401 });
+  }
+
+  // A logged-in attacker holding a stolen cookie can still brute-force the
+  // password field here, so the endpoint is budgeted on its own account.
+  const budget = await hit(
+    KEYS.passwordUser(session.user.id),
+    LIMITS.password.perUser,
+    LIMITS.password.windowMs,
+  );
+  if (!budget.ok) {
+    return NextResponse.json(
+      {
+        error: `Terlalu banyak percobaan. Coba lagi dalam ${Math.ceil(budget.retryAfter / 60)} menit.`,
+      },
+      { status: 429, headers: { "Retry-After": String(budget.retryAfter) } },
+    );
   }
 
   const user = await getUserById(session.user.id);
@@ -73,7 +98,7 @@ export async function POST(req: Request) {
 
   const { currentPassword, newPassword } = parsed.data;
 
-  if (!bcrypt.compareSync(currentPassword, user.passwordHash)) {
+  if (!(await bcrypt.compare(currentPassword, user.passwordHash))) {
     return NextResponse.json(
       {
         error: "Password sekarang salah.",
@@ -93,10 +118,12 @@ export async function POST(req: Request) {
     );
   }
 
-  await updateUserPassword(
-    user.id,
-    bcrypt.hashSync(newPassword, BCRYPT_ROUNDS),
-  );
+  await updateUserPassword(user.id, await bcrypt.hash(newPassword, BCRYPT_ROUNDS));
 
-  return NextResponse.json({ ok: true });
+  // Invalidates every session, including this request's own. The caller will
+  // be bounced to the login screen and has to sign in again with the new
+  // password — which is the point.
+  await bumpTokenVersion(user.id);
+
+  return NextResponse.json({ ok: true, reauth: true });
 }

@@ -33,6 +33,10 @@ export type UserRow = {
   emailVerified: boolean;
   /** Also vestigial, same reason. Every account is now "email". */
   authProvider: string;
+  /** Incremented on every password change. A JWT carries the value it was
+   *  issued with, so a mismatch means the session predates the change and
+   *  should be treated as signed out. See lib/auth.ts. */
+  tokenVersion: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -107,6 +111,7 @@ export function mapUser(r: Record<string, unknown>): UserRow {
     displayName: r.display_name as string,
     emailVerified: Boolean(r.email_verified),
     authProvider: r.auth_provider as string,
+    tokenVersion: Number(r.token_version ?? 0),
     createdAt: r.created_at as string,
     updatedAt: r.updated_at as string,
   };
