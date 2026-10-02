@@ -15,13 +15,12 @@
 //   - Size is checked before the body is read into memory, then checked again
 //     on the buffer, because Content-Length is a claim rather than a fact.
 //
-// Uploads land in Vercel Blob, not on the local disk.
+// Question images go to Cloudinary.
 //
-// The serverless filesystem is read-only and discarded between invocations,
-// so writing to public/uploads/questions/ works in `npm run dev` and silently
-// loses every file in production. Blob is the only durable option that does
-// not also mean rewriting how images are served. The local path is kept as a
-// development fallback so the app is still usable with no token configured.
+// The serverless filesystem is read-only and discarded between invocations, so
+// writing to public/uploads/questions/ works in `npm run dev` and silently
+// loses every file in production. Cloudinary is the store; the local disk stays
+// only as a development convenience, and production refuses to use it.
 import { NextResponse } from "next/server";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -29,15 +28,19 @@ import { auth } from "@/lib/auth";
 
 const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "questions");
-const BLOB_PREFIX = "questions";
+const FOLDER = "ealearn/questions";
 
 /**
- * Blob is used when a token is configured, which is what happens on Vercel.
- * Without one — local development — it falls back to the filesystem, which is
- * genuinely fine there because the disk is not thrown away between requests.
+ * Cloudinary is used when all three credentials are present, which is what
+ * happens in production. Without them — local development — the route falls
+ * back to the filesystem.
  */
-function blobConfigured(): boolean {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+function cloudinaryConfigured(): boolean {
+  return Boolean(
+    process.env.CLOUDINARY_CLOUD_NAME &&
+      process.env.CLOUDINARY_API_KEY &&
+      process.env.CLOUDINARY_API_SECRET,
+  );
 }
 
 /** Extensions we are willing to emit, keyed by the signature we detected. */
@@ -121,18 +124,29 @@ export async function POST(req: Request) {
   // entirely — it is the one piece of this input with no safe interpretation.
   const name = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}.${kind.ext}`;
 
-  if (blobConfigured()) {
-    const { put } = await import("@vercel/blob");
-    const blob = await put(`${BLOB_PREFIX}/${name}`, buf, {
-      access: "public",
+  if (cloudinaryConfigured()) {
+    const { uploadToCloudinary } = await import("@/lib/cloudinary");
+    const url = await uploadToCloudinary(buf, {
+      filename: name,
       contentType: kind.mime,
-      // The magic-byte check above is the real gate; this is belt and braces
-      // for anything that reaches Blob by another route later.
-      addRandomSuffix: false,
     });
     return NextResponse.json(
-      { url: blob.url, mime: kind.mime, bytes: buf.byteLength, storage: "blob" },
+      { url, mime: kind.mime, bytes: buf.byteLength, storage: "cloudinary" },
       { status: 201 },
+    );
+  }
+
+  // In production this is not a fallback, it is a data-loss bug: the Vercel
+  // function filesystem is discarded when the invocation ends, so the file
+  // would 404 on the next request. Failing loudly beats accepting an upload
+  // that is guaranteed to disappear.
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json(
+      {
+        error:
+          "Penyimpanan gambar belum dikonfigurasi. Isi CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY dan CLOUDINARY_API_SECRET.",
+      },
+      { status: 503 },
     );
   }
 

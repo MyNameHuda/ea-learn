@@ -29,8 +29,10 @@ const correctAnswer = z
  * Where an uploaded question image lives.
  *
  * Two shapes, because there are two storage backends:
- *   - disk (development): /uploads/questions/<name>.<ext>
- *   - Blob (Vercel):      https://<account>.public.blob.vercel-storage.com/questions/<name>.<ext>
+ *   - Cloudinary (production):
+ *       https://res.cloudinary.com/<cloud>/image/upload/<public_id>.<ext>
+ *   - disk (development only):
+ *       /uploads/questions/<name>.<ext>
  *
  * Constrained to those two forms rather than "any string". Unconstrained, this
  * field would accept `javascript:…` or an arbitrary external URL, and the value
@@ -38,21 +40,24 @@ const correctAnswer = z
  *
  * The extension whitelist mirrors the magic-byte check in /api/upload, so a
  * hand-crafted request cannot land an .svg here and have it rendered inline.
- * The `javascript:` / `data:` alternatives are excluded by requiring either a
- * single leading slash or an https:// origin — neither of those schemes can be
- * dressed up to match.
+ * `javascript:` and `data:` are excluded by requiring either a single leading
+ * slash or an https:// origin — neither scheme can be dressed up to match.
  */
-const IMAGE_FILENAME = String.raw`[A-Za-z0-9._-]+\.(?:png|jpg|gif|webp)`;
+const IMAGE_EXT = String.raw`(?:png|jpg|jpeg|gif|webp)`;
 
 const imageUrl = z
   .string()
   .max(500)
   .refine(
     (v) =>
-      new RegExp(`^/uploads/questions/${IMAGE_FILENAME}$`).test(v) ||
+      // Cloudinary. The cloud name segment is Cloudinary's own slug, and the
+      // version prefix (v123…) is optional because it only appears when the
+      // upload was transformed after the fact.
       new RegExp(
-        `^https://[A-Za-z0-9.-]+\\.public\\.blob\\.vercel-storage\\.com/questions/${IMAGE_FILENAME}$`,
-      ).test(v),
+        `^https://res\\.cloudinary\\.com/[A-Za-z0-9_-]+/image/(?:private_)?upload/[A-Za-z0-9_\\-/.]+\\.${IMAGE_EXT}$`,
+      ).test(v) ||
+      // Local development fallback.
+      new RegExp(`^/uploads/questions/[A-Za-z0-9._-]+\\.${IMAGE_EXT}$`).test(v),
     "URL gambar tidak valid",
   )
   .optional()

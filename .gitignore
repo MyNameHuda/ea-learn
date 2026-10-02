@@ -64,3 +64,5 @@ next-env.d.ts
 # Uploaded question images are user content, not source. On Vercel they live in
 # Blob, so this directory only exists locally in development.
 /public/uploads/
+
+.vercel

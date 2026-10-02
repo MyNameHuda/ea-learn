@@ -35,8 +35,10 @@ npm i -g vercel
 vercel link
 vercel env add DATABASE_URL production
 vercel env add AUTH_SECRET production
-vercel env add NEXTAUTH_URL production     # https://domain-anda.com
-vercel env add BLOB_READ_WRITE_TOKEN production   # Storage → Blob
+vercel env add NEXTAUTH_URL production           # https://domain-anda.com
+vercel env add CLOUDINARY_CLOUD_NAME production  # Storage → Cloudinary
+vercel env add CLOUDINARY_API_KEY production
+vercel env add CLOUDINARY_API_SECRET production
 npm run deploy
 ```
 
@@ -45,9 +47,13 @@ npm run deploy
 1. **Pakai endpoint POOLED.** Non-pooled akan kehabisan koneksi begitu
    beberapa fungsi hidup bersamaan. `lib/db.ts` memakai `max: 1` per instance
    karena itu.
-2. **BLOB_READ_WRITE_TOKEN wajib di produksi.** Tanpa itu, gambar soal ditulis
-   ke `public/uploads/` — yang bekerja di `npm run dev` tapi hilang di Vercel,
-   karena filesystem fungsi dibuang tiap invokasi.
+2. **Cloudinary wajib di produksi** untuk gambar soal. Tanpa
+   `CLOUDINARY_CLOUD_NAME` / `_API_KEY` / `_API_SECRET`, `/api/upload`
+   mengembalikan **503 dengan pesan jelas** — bukan menulis ke disk lalu
+   menghilangkan berkasnya diam-diam. Upload memakai tanda tangan server,
+   bukan upload preset: nama preset ikut terkirim ke browser dan bisa dibaca
+   siapa saja, lalu orang itu bisa mengirim berkas apa pun ke akunmu sampai
+   kuota habis.
 3. **Ganti AUTH_SECRET.** Nilai di repo berarti siapa pun yang membacanya bisa
    memalsukan sesi login.
 
@@ -277,7 +283,7 @@ object store sungguhan._asumsi itu hanya ada di satu file: `app/api/upload/route
 | Quiz editor PG | ✅ | Radio marking (satu jawaban benar) + add/remove opsi + gambar opsional |
 | Quiz editor essay | ✅ | Keyword + weight input + gambar opsional |
 | Share link | ✅ | 4-channel: WhatsApp / Telegram / Email / SMS |
-| Gambar soal | ✅ | Upload PNG/JPG/GIF/WebP (≤5MB) → Vercel Blob, tampil di layar anak & review |
+| Gambar soal | ✅ | Upload PNG/JPG/GIF/WebP (≤5MB) → Cloudinary, tampil di layar anak & review |
 | Child play (anonymous) | ✅ | Name input → per-question → submit |
 | Auto-grade PG | ✅ | Exact-match scoring |
 | Hybrid grading essay | ✅ | Keyword weight + parent override |
@@ -295,7 +301,7 @@ object store sungguhan._asumsi itu hanya ada di satu file: `app/api/upload/route
 Lihat bagian **Deploy ke Vercel** di atas untuk langkah lengkap.
 
 Ringkasnya: `npm run build` → pasang empat environment variable
-(`DATABASE_URL`, `AUTH_SECRET`, `NEXTAUTH_URL`, `BLOB_READ_WRITE_TOKEN`) →
+(`DATABASE_URL`, `AUTH_SECRET`, `NEXTAUTH_URL`, `CLOUDINARY_*`) →
 `vercel --prod`. `vercel.json` sudah menetapkan `regions: ["sin1"]` (Jakarta
 paling dekat denganNeon Singapore / Supabase Asia) — tanpa itu, fungsi Vercel
 default_compute di AS dan setiap query database-imposed ~250msBolak-balik.
@@ -320,7 +326,9 @@ default_compute di AS dan setiap query database-imposed ~250msBolak-balik.
    DATABASE_URL="postgresql://...pooled..."
    AUTH_SECRET="<32+ hex chars acak>"
    NEXTAUTH_URL="https://yourdomain.com"
-   BLOB_READ_WRITE_TOKEN="vercel_blob_rw_..."
+   CLOUDINARY_CLOUD_NAME="mynamehuda"
+   CLOUDINARY_API_KEY="123456789012345"
+   CLOUDINARY_API_SECRET="…"
    ```
 
 3. **Deploy**:
