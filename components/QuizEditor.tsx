@@ -132,6 +132,17 @@ export function QuizEditor({
     const body: Record<string, unknown> = {
       prompt: updated.prompt,
       points: updated.points,
+      // This body is assembled field by field rather than spread from
+      // `updated`, so every field has to be listed here or it silently never
+      // reaches the server. imageUrl was missing from that list: the upload
+      // succeeded, the editor showed a preview and said "Gambar ditambahkan",
+      // and image_url stayed NULL in the database — so the child opened the
+      // published quiz and saw a question with nothing to look at.
+      //
+      // `?? null` rather than `|| null` only for readability — mapQuestion
+      // always produces string | null, so both are equivalent. null is the
+      // value that clears the column, which is what clicking "Hapus" must do.
+      imageUrl: updated.imageUrl ?? null,
     };
     if (updated.type === "multiple_choice") {
       body.type = "multiple_choice";
