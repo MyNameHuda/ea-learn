@@ -49,8 +49,31 @@ declare module "next-auth" {
   interface User {
     id: string;
     tokenVersion: number;
+    /** Set when the person ticked "ingat saya". See REMEMBER_MAX_AGE. */
+    rememberMe: boolean;
   }
 }
+
+/**
+ * "Ingat saya" — how long a sign-in stays valid.
+ *
+ * The cookie ceiling is 30 days because that is the longest "remember me" any
+ * product should honour. Auth.js reads `session.maxAge` from config only — it
+ * is not per-token and not per-login — so a single config value has to be the
+ * *ceiling*, and the shorter, opt-out lifetime is enforced in the session
+ * callback instead: a token issued without the tick stops validating after
+ * SHORT_MAX_AGE even though the cookie itself lingers. The browser keeps a
+ * cookie it can no longer use, which is harmless; the alternative — a shorter
+ * cookie ceiling for everyone — would make the checkbox a lie.
+ *
+ * The security cost of ticking it is bounded, and the escape hatch still works:
+ * bumping token_version on a password change revokes remembered sessions too,
+ * because revocation is checked here and does not care how long the token was
+ * meant to live. Someone who thinks their device is compromised can tick the
+ * box on a shared laptop and still lock the session out from another device.
+ */
+const REMEMBER_MAX_AGE = 30 * 24 * 60 * 60; // 30 hari
+const SHORT_MAX_AGE = 24 * 60 * 60; // 1 hari
 
 /**
  * A real bcrypt hash of a random 64-character hex string, so no password can
@@ -63,10 +86,10 @@ const DUMMY_HASH = "$2b$10$/cmSzfHvrO7AWJAwZfqSVOXi38ot.4WaOSJHUScmYic/g5aNdsVe6
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: {
     strategy: "jwt",
-    // Was the 30-day default. A JWT cannot be revoked on its own, so its
-    // lifetime *is* the worst-case window after a compromise; 7 days bounds it
-    // even if the token_version check below is somehow bypassed.
-    maxAge: 7 * 24 * 60 * 60,
+    // The ceiling, not the default. See REMEMBER_MAX_AGE — a sign-in without
+    // "ingat saya" is cut off after a day by the session callback below, which
+    // is the only place in Auth.js that can vary per login.
+    maxAge: REMEMBER_MAX_AGE,
   },
   trustHost: true, // Required for non-Vercel deployments (localhost, custom server)
   pages: {
@@ -79,6 +102,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        rememberMe: { label: "Ingat saya", type: "checkbox" },
       },
       async authorize(credentials, request) {
         const email =
@@ -86,6 +110,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const password =
           typeof credentials?.password === "string" ? credentials.password : "";
         if (!email || !password) return null;
+
+        // Only an explicit "true" opts in. Anything else — a missing field, the
+        // string "false", a hand-crafted request — is a short-lived session.
+        const rememberMe = credentials?.rememberMe === "true";
 
         const { perAccount, perIp, windowMs } = LIMITS.login;
         const accountKey = KEYS.loginAccount(email);
@@ -123,15 +151,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: user.email,
           name: user.displayName,
           tokenVersion: user.tokenVersion,
+          rememberMe,
         };
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
+      // `user` is only present on sign-in. This callback also runs on every
+      // session read, so anything set here must be guarded by that check or
+      // the timestamp would slide forward forever and the short session below
+      // would never expire.
       if (user?.id) {
         token.id = user.id;
         token.ver = user.tokenVersion;
+        token.remember = Boolean(user.rememberMe);
+        token.issuedAt = Date.now();
       }
       return token;
     },
@@ -152,6 +187,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async session({ session, token }) {
       const id = token?.id as string | undefined;
       if (!id || !session.user) return session;
+
+      // A sign-in without the tick expires after a day even though the cookie
+      // has 30 days left on it. A token issued before this field existed has
+      // no issuedAt and is treated as short-lived rather than trusted.
+      if (!token.remember) {
+        const issuedAt = Number(token.issuedAt ?? 0);
+        if (!issuedAt || Date.now() - issuedAt > SHORT_MAX_AGE * 1000) {
+          return { ...session, user: undefined } as unknown as typeof session;
+        }
+      }
 
       const user = await getUserById(id);
       if (!user || Number(token.ver ?? 0) !== user.tokenVersion) {

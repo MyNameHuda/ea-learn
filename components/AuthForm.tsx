@@ -54,6 +54,9 @@ export function AuthForm({
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  // Off by default. A parent on a borrowed or shared device is the case that
+  // matters here, and an unticked box is the safe thing to hand them.
+  const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [saving, startSave] = useTransition();
 
@@ -151,6 +154,10 @@ export function AuthForm({
       const res = await signIn("credentials", {
         email: email.trim(),
         password,
+        // Must be the string "true" — lib/auth.ts opts in on that exact value
+        // and treats anything else as "not remembered", so a stray boolean
+        // here would silently shorten the session instead of lengthening it.
+        rememberMe: rememberMe ? "true" : "false",
         redirect: false,
       });
       if (res?.error) {
@@ -260,6 +267,39 @@ export function AuthForm({
           "password",
           "new-password",
         )}
+
+      {!isSignup && (
+        // The label wraps the box, so the whole row is the tap target — the
+        // 16px square on its own is below the 44px minimum and awkward to hit
+        // on a phone, which is most of the people using this.
+        <label
+          htmlFor="af-remember"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            minHeight: 44,
+            marginTop: -4,
+            marginBottom: 12,
+            cursor: "pointer",
+            userSelect: "none",
+          }}
+        >
+          <input
+            id="af-remember"
+            type="checkbox"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+            style={{ width: 18, height: 18, accentColor: "var(--primary)", cursor: "pointer", flexShrink: 0 }}
+          />
+          <span style={{ fontSize: 13 }}>
+            Ingat saya di perangkat ini
+            <span className="t-soft" style={{ display: "block", fontSize: 11, marginTop: 1 }}>
+              Jangan centang di komputer bersama atau perangkat yang dipakai orang lain.
+            </span>
+          </span>
+        </label>
+      )}
 
       {errors.form && (
         <div className="alert alert-error" style={{ marginBottom: 14 }}>
