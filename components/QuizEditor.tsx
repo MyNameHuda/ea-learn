@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useToast } from "@/components/Toast";
@@ -55,6 +55,19 @@ export function QuizEditor({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isPublishing, startPublish] = useTransition();
   const [isPending, startTransition] = useTransition();
+
+  /* Keadaan terakhir yang benar-benar tersimpan di server, per soal.
+   *
+   * `questions` di bawah adalah keadaan yang ditampilkan layar, dan itu
+   * diisi duluan (optimistic) sebelum server sempat menjawab. Kalau PATCH-nya
+   * ditolak, isi di layar akan berbeda dari isi di database, dan pemakai
+   * akan me-reload lalu menemukan soalnya kosong — persis yang terjadi pada
+   * 40 soal "UH 2". Peta ini menjadi sumber kebenaran untuk apa yang sudah
+   * benar-benar tersimpan, sehingga kegagalan bisa dikembalikan, bukan
+   * diam-diam membiarkan layar menipu. */
+  const savedRef = useRef<Map<string, QuizQuestion>>(
+    new Map(initialQuestions.map((q) => [q.id, q])),
+  );
 
   const isDraft = quiz.status === "draft";
   const totalPoints = questions.reduce((s, q) => s + q.points, 0);
@@ -120,6 +133,9 @@ export function QuizEditor({
     const data = await res.json();
     if (data.question) {
       setQuestions([...questions, data.question]);
+      // Soal baru dibuat dengan isi kosong lalu diisi inline, jadi keadaan
+      // "tersimpan" untuk soal ini memang kosong sampai PATCH pertama sukses.
+      savedRef.current.set(data.question.id, data.question);
       setEditingId(data.question.id);
       showToast("Soal ditambahkan", "success");
     } else {
@@ -153,11 +169,38 @@ export function QuizEditor({
       body.keywords = updated.keywords;
       body.keywordWeights = updated.keywordWeights;
     }
-    await fetch(`/api/quiz/${quiz.id}/question/${updated.id}`, {
+    const res = await fetch(`/api/quiz/${quiz.id}/question/${updated.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
+
+    /* ── Kegagalan PATCH HARUS terlihat ──────────────────────────────────────
+     *
+     * Pemanggilan ini dulu membuang responsnya, dan `await fetch` tidak
+     * melempar error untuk status 4xx. Jadi server bisa menolak seluruh
+     * penyimpanan dengan 400, editor tetap menampilkan teksnya, dan orang
+     * tua mengira sedang mengetik dengan aman — lalu menemukan semua soalnya
+     * kosong saat me-reload.
+     *
+     * Sekarang kegagalan dibalas: toast muncul, dan isi soal dikembalikan
+     * ke keadaan terakhir yang benar-benar tersimpan di server, supaya layar
+     * tidak lagi menampilkan sesuatu yang tidak ada di database. */
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      const saved = savedRef.current.get(updated.id);
+      if (saved) {
+        setQuestions((qs) => qs.map((q) => (q.id === updated.id ? saved : q)));
+      }
+      showToast(
+        data?.error
+          ? `Gagal menyimpan soal: ${data.error}`
+          : "Gagal menyimpan soal. Perubahan belum tersimpan.",
+        "error",
+      );
+      return;
+    }
+    savedRef.current.set(updated.id, updated);
   }
 
   async function deleteQuestion(qid: string) {

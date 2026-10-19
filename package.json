@@ -11,6 +11,7 @@
         "db:reset": "node --env-file=.env --import tsx scripts/db-reset.ts",
         "db:inspect": "node --env-file=.env --import tsx scripts/db-inspect.ts",
         "db:test": "node --env-file=.env --import tsx scripts/db-test.ts",
+        "test:soal": "node --env-file=.env --import tsx scripts/test-question-save.mts",
         "deploy": "vercel --prod",
         "deploy:preview": "vercel"
     },

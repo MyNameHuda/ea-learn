@@ -45,6 +45,31 @@ const correctAnswer = z
  */
 const IMAGE_EXT = String.raw`(?:png|jpg|jpeg|gif|webp)`;
 
+/**
+ * "Tidak ada gambar" punya dua bentuk, dan keduanya harus bisa lewat.
+ *
+ * null  — dipakai QuestionImageField saat tombol "Hapus" ditekan, dan dipakai
+ *         editor saat menyimpan soal yang memang tidak punya gambar.
+ * ""    — bentuk lain dari "tidak ada gambar", untuk klien yang mengirim
+ *         string kosong alih-alih null.
+ *
+ * Keduanya berarti "kosongkan kolom ini". Absen (undefined) tetap berarti
+ * "jangan sentuh kolom ini", dan itulah yang membedakan menghapus gambar
+ * dari sekadar tidak menyentuhnya.
+ *
+ * ── Bug yang diperbaiki di sini ──────────────────────────────────────────────
+ * Skema ini dulu hanya menerima string atau undefined. Sementara itu editor
+ * selalu mengirim `imageUrl: updated.imageUrl ?? null` — null setiap kali
+ * soal tidak punya gambar. Akibatnya SETIAP penyimpanan soal tanpa gambar
+ * ditolak dengan 400 "Invalid input" pada field imageUrl, dan karena
+ * updateQuestion() tidak pernah sampai dipanggil, teks soal tidak pernah
+ * masuk ke database. Orang tua melihat soalnya kosong, dan tidak ada
+ * satu pun error yang terlihat di layar karena PATCH-nya tidak dicek.
+ *
+ * Bandingkan dengan /api/quiz/[id]/update, yang sudah memakai
+ * `.nullable().optional()` untuk description dan subject. Polanya sama:
+ * null berarti "kosongkan", absent berarti "jangan sentuh".
+ */
 const imageUrl = z
   .string()
   .max(500)
@@ -61,7 +86,8 @@ const imageUrl = z
     "URL gambar tidak valid",
   )
   .optional()
-  .or(z.literal("").transform(() => undefined));
+  .or(z.literal("").transform(() => null))
+  .or(z.null());
 
 export const pgSchema = z.object({
   type: z.literal("multiple_choice"),

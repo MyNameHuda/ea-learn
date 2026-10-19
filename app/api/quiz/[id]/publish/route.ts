@@ -91,9 +91,20 @@ export async function POST(
 
     const problems = await findIncomplete(id);
     if (problems.length > 0) {
+      /* Angka soal yang belum lengkap dipotong supaya pesannya masih terbaca.
+       *
+       * Daftar ini pernah sepanjang 40 nomor ("Soal nomor 1, 2, 3, ... 40
+       * belum lengkap"), yang tidak membantu orang tua menemukan soal yang
+       * bermasalah dan tidak muat di layar HP. Delapan pertama ditambah
+       * jumlahnya sudah cukup untuk tahu dari mana harus mulai. */
+      const MAX_SHOWN = 8;
+      const indexes = problems.map((p) => p.index);
+      const shown = indexes.slice(0, MAX_SHOWN);
+      const rest = indexes.length - shown.length;
+      const list = shown.join(", ") + (rest > 0 ? `, dan ${rest} soal lainnya` : "");
       return NextResponse.json(
         {
-          error: `Soal nomor ${problems.map((p) => p.index).join(", ")} belum lengkap.`,
+          error: `Soal nomor ${list} belum lengkap.`,
           problems,
         },
         { status: 400 },
