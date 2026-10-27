@@ -12,6 +12,7 @@
         "db:inspect": "node --env-file=.env --import tsx scripts/db-inspect.ts",
         "db:test": "node --env-file=.env --import tsx scripts/db-test.ts",
         "test:soal": "node --env-file=.env --import tsx scripts/test-question-save.mts",
+        "test:share": "node --env-file=.env --import tsx scripts/test-share-draft.mts",
         "deploy": "vercel --prod",
         "deploy:preview": "vercel"
     },

@@ -17,8 +17,10 @@ import {
   IconBook,
   IconChild,
   IconClock,
+  IconRocket,
 } from "@/components/Icon";
 import { timeAgoID } from "@/lib/utils";
+import { PublishButton } from "@/components/PublishButton";
 
 export default async function QuizDetailPage({
   params,
@@ -185,10 +187,17 @@ export default async function QuizDetailPage({
               href={`/quiz/${quiz.id}/share`}
               icon={<IconShareAlt size={20} />}
               title="Share Link"
-              desc="Bagikan ke anak"
+              desc={isDraft ? "Publish dulu baru bisa dibagikan" : "Bagikan ke anak"}
               color="var(--primary)"
               bg="var(--primary-soft)"
             />
+            {/* Publish reachable from here, not only from the editor.
+                Previously the only publish button lived inside the editor, so
+                a parent who opened the quiz detail page to send the link to
+                their child had to know to go back and hunt for the button
+                there. The link they got in the meantime was dead: /play/
+                <uuid> answers 404 for anything that is not "ready". */}
+            <PublishActionCard quizId={quiz.id} status={quiz.status} isDraft={isDraft} />
             <ActionCard
               href={`/quiz/${quiz.id}/results`}
               icon={<IconChart size={20} />}
@@ -352,5 +361,65 @@ function ActionCard({
         </div>
       </div>
     </Link>
+  );
+}
+
+/**
+ * Kartu aksi "Publish" / "Unpublish" yang bentuknya sama dengan ActionCard
+ * tapi berupa tombol, karena aksinya bukan navigasi.
+ *
+ * Card-nya harus setinggi ActionCard lain supaya grid action tidak bergeser
+ * saat status kuis berubah dari draft ke published.
+ */
+function PublishActionCard({
+  quizId,
+  status,
+  isDraft,
+}: {
+  quizId: string;
+  status: string;
+  isDraft: boolean;
+}) {
+  return (
+    <div
+      className="card"
+      style={{
+        padding: 14,
+        textAlign: "left",
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+      }}
+    >
+      <div
+        style={{
+          width: 40,
+          height: 40,
+          borderRadius: 12,
+          background: isDraft ? "var(--success-soft, var(--primary-soft))" : "var(--bg-soft)",
+          color: isDraft ? "var(--success-ink, var(--primary-ink))" : "var(--text-soft)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
+        {isDraft ? <IconRocket size={20} /> : <IconShare size={20} />}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontWeight: 600, color: "var(--text)", fontSize: 14 }}>
+          {isDraft ? "Publish Kuis" : "Unpublish"}
+        </div>
+        <div className="t-soft" style={{ fontSize: 12 }}>
+          {isDraft ? "Buka link untuk anak" : "Tutup link untuk anak"}
+        </div>
+      </div>
+      <PublishButton
+        quizId={quizId}
+        status={status}
+        label={isDraft ? "Publish" : "Unpublish"}
+        variant="ghost"
+      />
+    </div>
   );
 }
