@@ -209,6 +209,6 @@ console.log("\n=== 3. tidak ada advisory lock yang tertinggal ===");
 }
 
 console.log(
-  `\n=== ${fail === 0 ? "SEMUA LOLOS" : fail + " GAGAL"} — ${pass} pass, ${fail} fail ===`,
+  `\n=== ${fail === 0 ? "SEMUA LOLOS" : fail + " GAGAL"}: ${pass} pass, ${fail} fail ===`,
 );
 process.exit(fail === 0 ? 0 : 1);
