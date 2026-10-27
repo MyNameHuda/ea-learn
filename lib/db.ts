@@ -163,7 +163,35 @@ const SCHEMA_SQL = `
   -- database, so without this a session issued before a password change stays
   -- valid for its whole lifetime, which means a parent who resets a leaked
   -- password cannot actually lock the thief out. See lib/auth.ts.
-  ALTER TABLE users ADD COLUMN IF NOT EXISTS token_version INTEGER NOT NULL DEFAULT 0;
+  --
+  -- The catalog check below is not cosmetic. 'ALTER TABLE users ADD COLUMN IF
+  -- NOT EXISTS' takes an AccessExclusiveLock on 'users' EVEN WHEN THE COLUMN
+  -- IS ALREADY THERE, because the lock is taken before Postgres looks at the
+  -- catalog. This batch runs on every cold start of every lambda, so two
+  -- instances waking up at the same moment both wanted that lock and
+  -- deadlocked (40P01) on the 'users' relation. The child tapping "Mulai
+  -- Kuis" got a 500 and a red "Internal error" box, and it was intermittent
+  -- because it only needs two instances to start together.
+  --
+  -- Reading the catalog first costs only an AccessShareLock, so in steady
+  -- state nothing takes a write lock on 'users' at all.
+  --
+  -- pg_attribute with to_regclass is used instead of information_schema
+  -- because it resolves 'users' exactly the way the ALTER below does, through
+  -- search_path. information_schema.columns would need current_schema(), and
+  -- that returns NULL if the search path resolves to nothing, which would make
+  -- the check miss and run the ALTER anyway.
+  DO $$
+  BEGIN
+    IF NOT EXISTS (
+      SELECT 1 FROM pg_attribute
+       WHERE attrelid = to_regclass('users')
+         AND attname = 'token_version'
+         AND NOT attisdropped
+    ) THEN
+      ALTER TABLE users ADD COLUMN token_version INTEGER NOT NULL DEFAULT 0;
+    END IF;
+  END $$;
 
   -- Rate limiting counters. Shared across every lambda instance, which an
   -- in-memory Map could not be. expires_at is the instant the window closes,
@@ -259,12 +287,57 @@ const SCHEMA_SQL = `
 let schemaPromise: Promise<void> | null = null;
 
 /**
- * Creates the tables once per process.
+ * Kunci advisory supaya hanya satu instance yang menjalankan DDL.
  *
- * Concurrent lambdas can race here, which is why it is memoised as a promise
- * rather than a boolean: the losers await the same work instead of issuing a
- * second identical batch.
+ * The memoised promise below serialises the work INSIDE one process. It does
+ * nothing across processes, and on Vercel every lambda is its own process, so
+ * two lambdas cold-starting together both ran the same DDL batch. `pg_try`
+ * would be the wrong call here (it fails fast and the loser would then run the
+ * DDL anyway), so this takes the real lock and waits: the loser waits for the
+ * winner to finish creating the schema instead of racing it.
+ *
+ * The key is an arbitrary but fixed number. Any instance that wants to run the
+ * DDL asks for the same one.
  */
+const SCHEMA_LOCK_KEY = "8674212";
+
+/**
+ * Errors worth trying again.
+ *
+ * 40P01 deadlock_detected and 40001 serialization_failure both mean Postgres
+ * rolled the transaction back, so nothing was written and replaying the
+ * statement is safe. 55P03 lock_timeout is the advisory lock above running
+ * out of patience, and the holder is a different instance that may well be
+ * gone by the next attempt.
+ */
+const RETRYABLE_CODES = new Set(["40P01", "40001", "55P03"]);
+
+function isRetryable(err: unknown): boolean {
+  const code = (err as { code?: string } | null | undefined)?.code;
+  return typeof code === "string" && RETRYABLE_CODES.has(code);
+}
+
+/**
+ * Replays a statement that Postgres rolled back.
+ *
+ * The backoff is short and jittered: the point is to get out of the other
+ * transaction's way, not to wait for a human to look.
+ */
+async function withRetry<T>(fn: () => Promise<T>, attempts = 4): Promise<T> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (!isRetryable(err)) throw err;
+      lastError = err;
+      const wait = 40 * (attempt + 1) + Math.floor(Math.random() * 60);
+      await new Promise((r) => setTimeout(r, wait));
+    }
+  }
+  throw lastError;
+}
+
 /**
  * Creates the tables once per process, and every query waits for it.
  *
@@ -277,8 +350,7 @@ let schemaPromise: Promise<void> | null = null;
  */
 export function ensureSchema(): Promise<void> {
   if (!schemaPromise) {
-    schemaPromise = getPool()
-      .query(SCHEMA_SQL)
+    schemaPromise = withRetry(runSchema)
       // Counters whose window has closed can never be read again by `hit()`,
       // it resets them on the next conflict, so they are pure garbage. Pruned
       // once per process rather than per request: ensureSchema is memoised, so
@@ -289,9 +361,63 @@ export function ensureSchema(): Promise<void> {
           cutoff,
         ]);
       })
-      .then(() => undefined);
+      .then(() => undefined)
+      .catch((err) => {
+        // A failed attempt must not be cached. A warm lambda that lost one
+        // race would then fail every later request with the same stale error,
+        // long after the database was healthy again. Clearing the memo lets
+        // the next request try again; the advisory lock in runSchema keeps
+        // the retries from colliding with each other.
+        schemaPromise = null;
+        throw err;
+      });
   }
   return schemaPromise;
+}
+
+/**
+ * The DDL itself, under the advisory lock.
+ *
+ * Everything happens inside ONE explicit transaction, and that is not
+ * decoration. The connection string points at Neon's pooled endpoint, which is
+ * PgBouncer in transaction pooling mode: between two separate statements the
+ * client can be moved to a DIFFERENT Postgres backend. That was measured here,
+ * not assumed. With six instances starting at once, `pg_advisory_lock` landed
+ * on one backend, the schema batch landed on a second, and the unlock landed
+ * on a third. The lock was then held forever by an idle backend that nobody
+ * could reach again, and every later instance waited on it until the statement
+ * timed out.
+ *
+ * An explicit BEGIN pins the client to one backend for the whole transaction,
+ * so the lock, the DDL and the release all happen on the same backend.
+ *
+ * `pg_advisory_xact_lock` (transaction scoped) is used instead of
+ * `pg_advisory_lock` (session scoped) for a second reason: Postgres releases
+ * an xact lock by itself at COMMIT or ROLLBACK. There is no code path that
+ * can leak it, not even a crash between the DDL and the unlock.
+ */
+async function runSchema(): Promise<void> {
+  const client = await getPool().connect();
+  try {
+    await client.query("BEGIN");
+    try {
+      // Do not wait forever for the lock. If the instance holding it is stuck,
+      // the retry loop should get another turn. SET LOCAL is scoped to this
+      // transaction, so it cannot leak into later queries on this session.
+      await client.query("SET LOCAL lock_timeout = '15s'");
+      await client.query("SELECT pg_advisory_xact_lock($1::bigint)", [
+        SCHEMA_LOCK_KEY,
+      ]);
+      await client.query(SCHEMA_SQL);
+      await client.query("COMMIT");
+    } catch (err) {
+      // ROLLBACK releases the xact lock and drops any DDL from this attempt.
+      await client.query("ROLLBACK").catch(() => undefined);
+      throw err;
+    }
+  } finally {
+    client.release();
+  }
 }
 
 // ===========================
@@ -390,9 +516,9 @@ export async function allRows<T = unknown>(
   params?: SQLInputValue[],
 ): Promise<T[]> {
   await ensureSchema();
-  const res = await getPool().query(
-    toDollarPlaceholders(sql),
-    params as unknown[],
+  const text = toDollarPlaceholders(sql);
+  const res = await withRetry(() =>
+    getPool().query(text, params as unknown[]),
   );
   return res.rows as T[];
 }
@@ -402,9 +528,9 @@ export async function getRow<T = unknown>(
   params?: SQLInputValue[],
 ): Promise<T | undefined> {
   await ensureSchema();
-  const res = await getPool().query(
-    toDollarPlaceholders(sql),
-    params as unknown[],
+  const text = toDollarPlaceholders(sql);
+  const res = await withRetry(() =>
+    getPool().query(text, params as unknown[]),
   );
   return (res.rows[0] ?? undefined) as T | undefined;
 }
@@ -420,9 +546,9 @@ export async function runSql(
   params?: SQLInputValue[],
 ): Promise<{ changes: number }> {
   await ensureSchema();
-  const res = await getPool().query(
-    toDollarPlaceholders(sql),
-    params as unknown[],
+  const text = toDollarPlaceholders(sql);
+  const res = await withRetry(() =>
+    getPool().query(text, params as unknown[]),
   );
   return { changes: res.rowCount ?? 0 };
 }

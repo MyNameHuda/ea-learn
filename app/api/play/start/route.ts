@@ -49,6 +49,13 @@ export async function POST(req: Request) {
     });
   } catch (e) {
     console.error("[play start]", e);
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    // "Internal error" is what a developer writes, not what a child can act
+    // on. The real cause stays in the server log; the child gets a sentence
+    // that says what to do next, and the button below it still says "Mulai
+    // Kuis", so tapping it again is the obvious move.
+    return NextResponse.json(
+      { error: "Gagal mulai kuis. Coba lagi ya." },
+      { status: 500 },
+    );
   }
 }

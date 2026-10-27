@@ -14,6 +14,7 @@
         "test:soal": "node --env-file=.env --import tsx scripts/test-question-save.mts",
         "test:share": "node --env-file=.env --import tsx scripts/test-share-draft.mts",
         "test:ringkasan": "node --env-file=.env --import tsx scripts/test-attempt-summary.mts",
+        "test:db": "node --env-file=.env --import tsx scripts/test-db-deadlock.mts",
         "deploy": "vercel --prod",
         "deploy:preview": "vercel"
     },
