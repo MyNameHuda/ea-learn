@@ -19,7 +19,7 @@
 
 # Local database backups.
 #
-# The app no longer uses SQLite at all — it runs entirely on a hosted
+# The app no longer uses SQLite at all, it runs entirely on a hosted
 # PostgreSQL. These exist only as a manual safety net, and they must never be
 # committed or, worse, uploaded as part of a Vercel deployment.
 *.db
@@ -43,7 +43,7 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 #
 # .env holds the real Neon connection string and the session secret. It is
-# listed here and nowhere else may be relaxed — a committed DATABASE_URL is a
+# listed here and nowhere else may be relaxed, a committed DATABASE_URL is a
 # public database and a committed AUTH_SECRET is a way to mint a login cookie.
 .env*
 
@@ -54,7 +54,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Local verification scratch — screenshots, throwaway probes, audit output.
+# Local verification scratch, screenshots, throwaway probes, audit output.
 # None of it is source, and some of it contains fixture credentials.
 /.shot-tmp/
 

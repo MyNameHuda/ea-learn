@@ -13,7 +13,7 @@
        *-soft  = surface / fill (large areas, never carries body text)
        *-ink   = accessible text/icon colour (>= 4.5:1 on --bg / --card)
      v3 used one value for both, which is why --text-muted sat at 2.75:1
-     and --accent at 2.08:1 — both unreadable as text.
+     and --accent at 2.08:1, both unreadable as text.
 
      Palette note: the logo's own blue #317ad8 is 4.28:1 on white, which fails
      AA for the 14px bold label inside .btn-primary. So --primary is the brand
@@ -181,7 +181,7 @@ html, body {
   scroll-padding-bottom: 80px;
 }
 
-/* v4 bugfix — the page background lived on <body> and that killed every
+/* v4 bugfix, the page background lived on <body> and that killed every
    `.bg-aurora` layer in the app.
 
    `.bg-aurora` is `position: fixed; inset: 0; z-index: -1`. In the root
@@ -190,7 +190,7 @@ html, body {
    therefore paints straight over the aurora and hides it completely.
 
    That was invisible everywhere except on the dark-background pages
-   (/quiz/[id]/share and all of /play/*), where white text sat on cream —
+   (/quiz/[id]/share and all of /play/*), where white text sat on cream,
    "Kuis siap dishare!" and the whole kid-facing quiz header were unreadable.
 
    The fix: keep `--bg` on <html> (the root element's background propagates to
@@ -301,7 +301,7 @@ a:focus-visible {
 }
 
 /* ==========================================================================
-   LAYOUTS — responsive helpers
+   LAYOUTS: responsive helpers
    ========================================================================== */
 
 /* Shells stay transparent so the fixed `.bg-aurora` layer behind them is
@@ -330,7 +330,7 @@ a:focus-visible {
   }
 }
 
-/* Login / signup — one centred column.
+/* Login / signup: one centred column.
 
    Replaces the .split-screen pair. The hero column was decorative weight: on a
    phone it stacked above the form, pushing the fields a full screen down, and
@@ -580,7 +580,7 @@ textarea.form-control { resize: vertical; min-height: 96px; line-height: 1.55; }
 
    Both classes were referenced by the now-removed /reset-password screens
    but had NO rule here at all. An undefined class is just a bare <div>, so
-   those two screens rendered with no padding, no max-width and no centering —
+   those two screens rendered with no padding, no max-width and no centering,
    the form ran off the right edge of the screen and the "← Kembali" link sat
    on the same line as the logo (see .brand-logo below).
    ========================================================================== */
@@ -613,7 +613,7 @@ textarea.form-control { resize: vertical; min-height: 96px; line-height: 1.55; }
 }
 .btn-icon:hover { background: var(--border-soft); color: var(--text); }
 
-/* Loading placeholder lines — a heading-width bar over two body-width bars. */
+/* Loading placeholder lines, a heading-width bar over two body-width bars. */
 .skeleton-text { height: 14px; margin-bottom: 10px; }
 .skeleton-text.lg { height: 22px; width: 45%; margin-bottom: 18px; }
 .skeleton-text.md { width: 100%; }
@@ -633,13 +633,13 @@ textarea.form-control { resize: vertical; min-height: 96px; line-height: 1.55; }
 }
 
 /* ==========================================================================
-   LANDING PAGE — phone compression
+   LANDING PAGE: phone compression
 
    Measured at 390x844 the landing page was 2509px (2.97 screens of scroll).
    The hero alone was 525px because the 37px headline wrapped to four lines and
    the paragraph ran to five, so two thirds of the first screen went to the
    pitch before a single actionable thing appeared. The "Cara pakai" block was
-   worse at 821px — four cards, each forced to a full-width row by a 180px
+   worse at 821px, four cards, each forced to a full-width row by a 180px
    minmax at a 358px content width.
 
    These rules keep the desktop composition untouched and only compress the
@@ -685,7 +685,7 @@ textarea.form-control { resize: vertical; min-height: 96px; line-height: 1.55; }
 @media (min-width: 768px) {
   .landing-step { padding: 16px; }
 }
-/* Decorative only — the numbered circle already reads as "step N". */
+/* Decorative only, the numbered circle already reads as "step N". */
 .landing-step__icon { display: none; }
 @media (min-width: 768px) {
   .landing-step__icon { display: flex; }
@@ -723,7 +723,7 @@ textarea.form-control { resize: vertical; min-height: 96px; line-height: 1.55; }
    ========================================================================== */
 
 /* Was display: inline-flex. Inside a flex parent the browser blockifies it
-   anyway, so this only ever mattered in block parents — where it flowed onto
+   anyway, so this only ever mattered in block parents, where it flowed onto
    the same line as any preceding inline content, which is how the logo ended
    up printed on top of the "← Kembali" link on the old reset-password screen.
    `flex` keeps every existing usage visually identical and fixes the block
@@ -739,7 +739,7 @@ textarea.form-control { resize: vertical; min-height: 96px; line-height: 1.55; }
   color: var(--primary-dark);
 }
 /* The real logo artwork. `.logo-mark` used to be a gradient tile with a
-   letter "E" typed into it — a placeholder that predated any brand asset. The
+   letter "E" typed into it, a placeholder that predated any brand asset. The
    mark is a transparent-captain-book glyph, so it is dropped straight in
    without the old tile background or the text-coloured glow, both of which
    were faking a logo the app never had.
@@ -775,7 +775,7 @@ textarea.form-control { resize: vertical; min-height: 96px; line-height: 1.55; }
    ========================================================================== */
 
 /* Inline links ("Belum punya akun? Daftar gratis") sit inside a sentence, so
-   they render at text size — measured at 16px tall, well under the 44px touch
+   they render at text size, measured at 16px tall, well under the 44px touch
    minimum, and this app is used on phones.
 
    The padding grows the hit area to ~36px without moving anything: the negative
@@ -828,7 +828,7 @@ textarea.form-control { resize: vertical; min-height: 96px; line-height: 1.55; }
 
 /* ==========================================================================
    NAVIGATION
-   Mobile: sticky bottom bar. Desktop (>=768px): a real top bar — a
+   Mobile: sticky bottom bar. Desktop (>=768px): a real top bar, a
    4-column bottom bar stretched across 1200px was the single most
    dated-looking thing in v3.
    ========================================================================== */
@@ -912,7 +912,7 @@ textarea.form-control { resize: vertical; min-height: 96px; line-height: 1.55; }
 
    1. `.bottom-nav` is rendered AFTER <main> so it can sit at the bottom on
       phones. Its desktop rule was `position: sticky; top: 0`, but a sticky
-      element only pins once it reaches the top of the scroll — so on a
+      element only pins once it reaches the top of the scroll, so on a
       dashboard with a long quiz list the navigation was stranded ~2000px
       down and you only found it after scrolling to the very end. Flex
       `order` lifts it to the top without moving the markup, so phones keep
@@ -920,7 +920,7 @@ textarea.form-control { resize: vertical; min-height: 96px; line-height: 1.55; }
    2. Stacked list rows read fine at 480px but became 58px-tall ribbons
       stretched across 1170px, so a dozen drafts meant a very long thin scroll.
    3. 1200px of content inside a 1920px viewport wasted 360px per side.
-   4. The FAB duplicated the "Buat Kuis" item already in the nav — its
+   4. The FAB duplicated the "Buat Kuis" item already in the nav, its
       `display: none` lives next to the base .fab rule, not here, because a
       media query carries no specificity.
    ========================================================================== */
@@ -938,7 +938,7 @@ textarea.form-control { resize: vertical; min-height: 96px; line-height: 1.55; }
     -webkit-backdrop-filter: none;
   }
 
-  /* The nav now owns `top: 0` — see the `position: static` override next to
+  /* The nav now owns `top: 0`, see the `position: static` override next to
      the base .page-header rule further down, which is where it has to live to
      win on source order. */
   .page-header {
@@ -954,7 +954,7 @@ textarea.form-control { resize: vertical; min-height: 96px; line-height: 1.55; }
   .shell-mobile-full { max-width: 1400px; }
 }
 
-/* (2) Responsive list grid — stacked on phones, tiles on desktop. */
+/* (2) Responsive list grid, stacked on phones, tiles on desktop. */
 .list-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -1054,7 +1054,7 @@ textarea.form-control { resize: vertical; min-height: 96px; line-height: 1.55; }
 
 /* Desktop: the nav has taken over the pinned top slot, so the header must
    stop being sticky too. Both were `position: sticky; top: 0` and therefore
-   pinned to the same offset — measured 60px of overlap, with "Dashboard" and
+   pinned to the same offset, measured 60px of overlap, with "Dashboard" and
    "Keluar" bleeding through the nav on every scroll. Letting the header scroll
    away keeps the nav as the single persistent bar, and it stays correct on
    pages with no nav at all (/profile, /quiz/[id], /quiz/new), where offsetting
@@ -1076,7 +1076,7 @@ textarea.form-control { resize: vertical; min-height: 96px; line-height: 1.55; }
 }
 .page-header .back,
 .page-header .action {
-  /* 36px in v3 — under the 44px minimum. */
+  /* 36px in v3, under the 44px minimum. */
   width: var(--tap);
   height: var(--tap);
   border-radius: var(--radius-sm);
@@ -1159,7 +1159,7 @@ textarea.form-control { resize: vertical; min-height: 96px; line-height: 1.55; }
 }
 /* From 1024px the nav sits across the top and already carries a "Buat Kuis"
    item, so a second floating create button is just clutter on the same screen.
-   This has to live AFTER the base `.fab` rule above — a media query adds no
+   This has to live AFTER the base `.fab` rule above, a media query adds no
    specificity, so an earlier `.fab { display: none }` would lose to the later
    `.fab { display: flex }`. */
 @media (min-width: 1024px) {
@@ -1167,7 +1167,7 @@ textarea.form-control { resize: vertical; min-height: 96px; line-height: 1.55; }
 }
 
 /* ==========================================================================
-   PAGE-SPECIFIC BACKGROUNDS — differentiate pages visually
+   PAGE-SPECIFIC BACKGROUNDS: differentiate pages visually
    ========================================================================== */
 
 .bg-aurora {
@@ -1277,7 +1277,7 @@ textarea.form-control { resize: vertical; min-height: 96px; line-height: 1.55; }
 
 /* `.qr-placeholder` was removed with the fake QR block on /quiz/[id]/share.
    It was a decorative checkerboard with two fake finder squares captioned
-   "Scan QR atau copy link di bawah" — not a QR code, and it never encoded the
+   "Scan QR atau copy link di bawah", not a QR code, and it never encoded the
    share link, so scanning it could only ever fail. If a real QR is wanted
    later it needs an actual encoder (e.g. the `qrcode` package), never CSS. */
 

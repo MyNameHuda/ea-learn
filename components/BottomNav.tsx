@@ -8,13 +8,13 @@ import { IconChart, IconHome, IconList, IconUser } from "@/components/Icon";
  * Primary navigation.
  *
  * v3 shipped four emoji (🏠 📝 📊 👤) and pointed two of them at routes that
- * do not exist — /dashboard/quizzes and /dashboard/stats were never
+ * do not exist, /dashboard/quizzes and /dashboard/stats were never
  * created, so tapping "Kuis" or "Statistik" 404'd. Both are folded into
  * /dashboard, which is where the quiz list and the attempt stats already
  * live (the dashboard renders "Kuis Aktif", "Akses cepat" and the stats
  * tiles). /quiz/new stays reachable through its own affordances.
  *
- * "Hasil" used to be `/dashboard#hasil` — an anchor that exists nowhere in
+ * "Hasil" used to be `/dashboard#hasil`, an anchor that exists nowhere in
  * the app, so the item scrolled nowhere. It is a real page now: /hasil rolls
  * up every quiz the parent has shared, with attempts, averages and pass
  * counts, and drills into /quiz/<id>/results.

@@ -1,4 +1,4 @@
-// POST /api/play/submit — Submit attempt (triggers auto-grade)
+// POST /api/play/submit: Submit attempt (triggers auto-grade)
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getAttemptById } from "@/lib/queries/data";

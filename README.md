@@ -11,7 +11,7 @@
 
 ## 🚀 Quick Start
 
-Butuh **PostgreSQL** — tidak ada lagi SQLite lokal. Gratis semua cukup:
+Butuh **PostgreSQL**, tidak ada lagi SQLite lokal. Gratis semua cukup:
 [Neon](https://neon.tech) atau [Supabase](https://supabase.com).
 
 ```bash
@@ -49,7 +49,7 @@ npm run deploy
    karena itu.
 2. **Cloudinary wajib di produksi** untuk gambar soal. Tanpa
    `CLOUDINARY_CLOUD_NAME` / `_API_KEY` / `_API_SECRET`, `/api/upload`
-   mengembalikan **503 dengan pesan jelas** — bukan menulis ke disk lalu
+   mengembalikan **503 dengan pesan jelas**, bukan menulis ke disk lalu
    menghilangkan berkasnya diam-diam. Upload memakai tanda tangan server,
    bukan upload preset: nama preset ikut terkirim ke browser dan bisa dibaca
    siapa saja, lalu orang itu bisa mengirim berkas apa pun ke akunmu sampai
@@ -64,7 +64,7 @@ npm run deploy
 **PostgreSQL** lewat `pg` (`lib/db.ts`). Tanpa ORM.
 
 **Penting untuk serverless:**
-- Pool dibuat **saat query pertama**, bukan saat import — `next build`
+- Pool dibuat **saat query pertama**, bukan saat import, `next build`
   mengimpor semua route, dan pool yang dibuat saat import akan membuat build
   butuh koneksi database (di Vercel, itu berarti build menyentuh produksi).
 - `max: 1` per instance. Postgres menghitung koneksi per database, bukan per
@@ -72,7 +72,7 @@ npm run deploy
   langsung kehabisan koneksi.
 - Type parser untuk `int8` (OID 20) dipasang manual, karena `pg` mengirimnya
   sebagai string dan `SUM()`/hitungan besar akan rusak diam-diam.
-- Timestamp tetap kolom `TEXT`, bukan `TIMESTAMPTZ` — aplikasinya menulis
+- Timestamp tetap kolom `TEXT`, bukan `TIMESTAMPTZ`, aplikasinya menulis
   string ISO dan membacanya sebagai string. Mengubahnya akan memberi objek
   `Date` di tempat yang mengharapkan string.
 
@@ -156,7 +156,7 @@ ealearn/
 
 ## 🗄 Database
 
-*(Lihat bagian Deploy di atas — ringkas: PostgreSQL via `pg`, tanpa ORM, pool
+*(Lihat bagian Deploy di atas, ringkas: PostgreSQL via `pg`, tanpa ORM, pool
 `max: 1` per instance serverless, dan skrip `db:*` untuk seed/reset/inspect/
 migrate.)*
 
@@ -167,7 +167,7 @@ migrate.)*
 - **NextAuth v5** (beta.32) dengan Credentials provider
 - **JWT session** strategy (no DB session table)
 - Email lowercased + trimmed at signup & lookup
-- **Tidak ada verifikasi email** dan **tidak ada reset password otomatis** —
+- **Tidak ada verifikasi email** dan **tidak ada reset password otomatis**,
   keduanya butuh mailer yang tidak dijalankan. Lupa password ditangani manual
   lewat email/WhatsApp ke developer (`components/ContactSupport.tsx`).
 - `lib/auth.ts` butuh `AUTH_SECRET` dari `.env` di produksi
@@ -229,7 +229,7 @@ Child (4, anonymous):          PWA:
 ```
 
 **Auth: email + password, tanpa verifikasi email.** Pendaftaran di `/signup`
-langsung membuat akun yang bisa dipakai — tidak ada kode yang dikirim, tidak
+langsung membuat akun yang bisa dipakai, tidak ada kode yang dikirim, tidak
 ada layar kedua yang bisa menggantung. `/login` menerima email + password
 (bcrypt, `Credentials` provider).
 
@@ -243,7 +243,7 @@ halaman Masuk dan di `/profile/akun`.
 Karena tidak ada email keluar sama sekali, `nodemailer` sudah dilepas dari
 dependensi. Tidak ada kredensial SMTP atau OAuth yang perlu diisi.
 
-**Gambar soal.** Setiap soal boleh punya satu gambar opsional — untuk geometri,
+**Gambar soal.** Setiap soal boleh punya satu gambar opsional, untuk geometri,
 peta, atau soal yang perlu dibaca dari gambar. Fieldnya ada di editor untuk soal
 pilihan ganda maupun essay, dan gambarnya ikut tampil di layar anak serta di
 halaman review orang tua.
@@ -252,17 +252,17 @@ Upload lewat `POST /api/upload` (butuh login), dan berkas diperlakukan sebagai
 input musuh:
 
 - Tipe ditentukan dari **magic bytes**, bukan dari `Content-Type` atau nama file
-  yang dikirim browser — keduanya bisa dipalsukan.
+  yang dikirim browser, keduanya bisa dipalsukan.
 - Nama file **dibuat server**, bukan diambil dari nama unggahan. Kalau memakai
   nama itu, `../../etc/passwd` akan lolos.
 - **SVG ditolak.** SVG adalah dokumen XML yang bisa membawa `<script>`, dan
-  gambarnya disajikan dari origin yang sama dengan aplikasinya — jadi SVG
+  gambarnya disajikan dari origin yang sama dengan aplikasinya, jadi SVG
   unggahan adalah stored XSS. Menolaknya lebih murah daripada membersihkannya.
 - Batas 5 MB, diperiksa sebelum body dibaca ke memori dan lagi setelahnya,
   karena `Content-Length` itu klaim, bukan fakta.
 
 Berkas disimpan di `public/uploads/questions/` (gitignored). Kalau nanti
-dipindah ke hosting serverless, folder itu tidak awet — endpoint upload perlu
+dipindah ke hosting serverless, folder itu tidak awet, endpoint upload perlu
 object store sungguhan._asumsi itu hanya ada di satu file: `app/api/upload/route.ts`.
 
 ---
@@ -274,7 +274,7 @@ object store sungguhan._asumsi itu hanya ada di satu file: `app/api/upload/route
 | Parent login | ✅ | `/login` (split panel) + `signIn("credentials")` dari NextAuth |
 | Email + password auth | ✅ | bcryptjs cost 10, JWT session, `Credentials` provider |
 | Signup | ✅ | `/signup` + `/api/auth/signup`, dengan konfirmasi password |
-| Email verification | ❌ | Sengaja dihapus — lihat catatan Auth di bagian Routes |
+| Email verification | ❌ | Sengaja dihapus, lihat catatan Auth di bagian Routes |
 | Lupa password | ⚠️ Manual | Belum ada reset otomatis; kontak developer via email/WhatsApp |
 | Onboarding 3-step | ✅ | `/onboarding` wizard + `/api/onboarding/save` |
 | Dashboard | ✅ | Bento grid + BottomNav + FAB |
@@ -289,8 +289,8 @@ object store sungguhan._asumsi itu hanya ada di satu file: `app/api/upload/route
 | Hybrid grading essay | ✅ | Keyword weight + parent override |
 | Essay review UI | ✅ | Slider override + komentar + auto-recompute |
 | Result detail per-soal | ✅ | Correct/wrong indicators + colors |
-| Reset password | ❌ | Sengaja dihapus — kontak developer manual |
-| Email verification | ❌ | Sengaja dihapus — lihat catatan Auth di bagian Routes |
+| Reset password | ❌ | Sengaja dihapus, kontak developer manual |
+| Email verification | ❌ | Sengaja dihapus, lihat catatan Auth di bagian Routes |
 | PWA install | ✅ | manifest.json + service worker + apple-mobile meta |
 | Responsive (PC + Mobile) | ✅ | Auto-fit grids, centered auth, breakpoints |
 
@@ -303,7 +303,7 @@ Lihat bagian **Deploy ke Vercel** di atas untuk langkah lengkap.
 Ringkasnya: `npm run build` → pasang empat environment variable
 (`DATABASE_URL`, `AUTH_SECRET`, `NEXTAUTH_URL`, `CLOUDINARY_*`) →
 `vercel --prod`. `vercel.json` sudah menetapkan `regions: ["sin1"]` (Jakarta
-paling dekat denganNeon Singapore / Supabase Asia) — tanpa itu, fungsi Vercel
+paling dekat denganNeon Singapore / Supabase Asia), tanpa itu, fungsi Vercel
 default_compute di AS dan setiap query database-imposed ~250msBolak-balik.
 
 ### Pre-requisites
@@ -338,7 +338,7 @@ default_compute di AS dan setiap query database-imposed ~250msBolak-balik.
 
 ### Untuk Postgres di luar Vercel (VPS, Railway, Fly)
 
-`lib/db.ts` tidak peduli di mana database-nya — yang dibutuhkan hanya satu
+`lib/db.ts` tidak peduli di mana database-nya, yang dibutuhkan hanya satu
 `DATABASE_URL` yang menunjuk ke PostgreSQL. Kalau self-hosting, `npm start`
 sudah cukup dan `vercel.json` tidak dipakai sama sekali.
 
@@ -365,4 +365,4 @@ sudah cukup dan `vercel.json` tidak dipakai sama sekali.
 
 ## 📜 License
 
-Proprietary — internal project.
+Proprietary, internal project.

@@ -1,4 +1,4 @@
-// Seed script — populate the PostgreSQL database with realistic dummy data
+// Seed script: populate the PostgreSQL database with realistic dummy data
 // Run: npm run db:seed
 //
 // Rewritten for PostgreSQL. Beyond the async change, the deletes are now
@@ -6,7 +6,7 @@
 // transaction and the order never mattered, whereas each statement here is
 // its own round-trip and the foreign keys really are enforced.
 //
-// The one thing that has NOT changed is the intent — this is a local
+// The one thing that has NOT changed is the intent, this is a local
 // convenience for filling an empty database. Never point it at a database
 // that has real rows in it.
 
@@ -89,7 +89,7 @@ async function main() {
     `INSERT INTO quizzes (id, user_id, share_uuid, title, description, subject, age_range, status, published_at, created_at, updated_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, 'ready', ?, ?, ?)`,
     [
-      quiz2Id, rinaId, quiz2Share, "IPA — Tata Surya",
+      quiz2Id, rinaId, quiz2Share, "IPA: Tata Surya",
       "Planet-planet di tata surya kita.",
       "IPA", "9-12",
       new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), nowIso, nowIso,

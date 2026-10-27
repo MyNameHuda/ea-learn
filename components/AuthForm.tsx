@@ -5,8 +5,8 @@
  *
  * One component with a `mode` prop rather than two near-identical forms: the
  * two screens were drifting apart (signup grew a confirm field and a strength
- * meter, login grew a "belum punya akun" link) and every shared rule — the
- * password policy, the email pattern, what counts as a valid submission — had
+ * meter, login grew a "belum punya akun" link) and every shared rule, the
+ * password policy, the email pattern, what counts as a valid submission, had
  * to be kept in sync by hand. Now there is only one copy of each.
  *
  * No verification step. Signup creates a usable account immediately; there is no
@@ -128,7 +128,7 @@ export function AuthForm({
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
           // No toast here. The message is already rendered inline on the field
-          // that caused it, and a second copy floated to the top of the page —
+          // that caused it, and a second copy floated to the top of the page,
           // landing as a white slab across the dark hero panel. Two copies of
           // the same sentence is noise, not redundancy that helps.
           setErrors({ ...(data.fieldErrors ?? {}), form: data.error ?? "Gagal membuat akun" });
@@ -139,7 +139,7 @@ export function AuthForm({
         // confirms a state change they cannot otherwise see.
         //
         // The wording is deliberately conditional. The server answers 201
-        // whether or not it actually created a row — it refuses to confirm
+        // whether or not it actually created a row, it refuses to confirm
         // that an address is taken, because an endpoint that does is a list of
         // your users. So "Akun dibuat" would be a lie in the duplicate case;
         // this sentence is true either way and tells them what to do next.
@@ -154,7 +154,7 @@ export function AuthForm({
       const res = await signIn("credentials", {
         email: email.trim(),
         password,
-        // Must be the string "true" — lib/auth.ts opts in on that exact value
+        // Must be the string "true", lib/auth.ts opts in on that exact value
         // and treats anything else as "not remembered", so a stray boolean
         // here would silently shorten the session instead of lengthening it.
         rememberMe: rememberMe ? "true" : "false",
@@ -166,7 +166,7 @@ export function AuthForm({
         // which without telling an attacker whether the address has an account
         // here. So this wording covers both without confirming either.
         setErrors({
-          form: "Email atau password salah — atau terlalu banyak percobaan dari perangkat ini. Coba lagi dalam 15 menit.",
+          form: "Email atau password salah, atau terlalu banyak percobaan dari perangkat ini. Coba lagi dalam 15 menit.",
         });
         return;
       }
@@ -269,7 +269,7 @@ export function AuthForm({
         )}
 
       {!isSignup && (
-        // The label wraps the box, so the whole row is the tap target — the
+        // The label wraps the box, so the whole row is the tap target, the
         // 16px square on its own is below the 44px minimum and awkward to hit
         // on a phone, which is most of the people using this.
         <label
@@ -365,7 +365,7 @@ export function ForgotPasswordNote() {
         className="t-soft"
         style={{ fontSize: 12, textAlign: "center", marginBottom: 10, lineHeight: 1.7 }}
       >
-        Lupa password? Belum ada reset otomatis — hubungi kami langsung, nanti
+        Lupa password? Belum ada reset otomatis, hubungi kami langsung, nanti
         kami bantu atur ulang.
       </p>
       <ContactSupport compact />

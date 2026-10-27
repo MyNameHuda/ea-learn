@@ -15,7 +15,7 @@ import {
  *
  * Deleting an option renumbers the key, and the editor does that client-side.
  * This is the backstop for anything that reaches PATCH without going through
- * the editor — a script, curl, a future client.
+ * the editor, a script, curl, a future client.
  */
 function keyOutOfRange(options: string[], key: number[]) {
   const max = options.length - 1;
@@ -73,7 +73,7 @@ export async function PATCH(
     const body = await req.json();
 
     // This route used to hand the raw body to await updateQuestion() with no checks
-    // whatsoever — and PATCH is the path the editor takes every time a field
+    // whatsoever, and PATCH is the path the editor takes every time a field
     // loses focus, including the answer key. So the "one correct answer" rule
     // could be written here even while the add route enforced it.
     const parsed = questionSchema.safeParse(body);

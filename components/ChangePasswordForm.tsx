@@ -3,7 +3,7 @@
 /**
  * Change-password form for a signed-in user.
  *
- * Requires the current password even though you are already logged in — that
+ * Requires the current password even though you are already logged in, that
  * is what stops someone who borrows an unlocked device from quietly locking
  * the owner out of their own account.
  *
@@ -84,13 +84,13 @@ export function ChangePasswordForm() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        // Inline only — see the note in components/AuthForm.tsx. The toast
+        // Inline only, see the note in components/AuthForm.tsx. The toast
         // would restate a message already sitting on the offending field.
         setErrors({ ...(data.fieldErrors ?? {}), form: data.error ?? "Gagal" });
         return;
       }
       setDone(true);
-      // The server bumped token_version, which ends this session too — that is
+      // The server bumped token_version, which ends this session too, that is
       // the whole point: a password reset has to log out whoever was holding
       // the old cookie, including the person who just made the change. Say so
       // before the redirect, or the login screen looks like a random bounce.

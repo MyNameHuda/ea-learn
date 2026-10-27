@@ -4,8 +4,8 @@
  * Email + password only. There is no email-verification step: a verification
  * code proved the person controlled the mailbox they had just typed, so it
  * added a round-trip and a way to get locked out of your own account without
- * telling anyone anything new. Account recovery is handled by a human instead
- * — see components/ContactSupport.
+ * telling anyone anything new. Account recovery is handled by a human instead,
+ * see components/ContactSupport.
  *
  * First-time users come from /signup; there is no separate verification step
  * to complete afterwards.
@@ -23,7 +23,7 @@
  *
  * 2. A failed sign-in takes the same time as a successful one. Before, an
  *    unknown email returned before bcrypt ever ran, and the 88 ms difference
- *    was measurable from the outside — enough to enumerate who has an account.
+ *    was measurable from the outside, enough to enumerate who has an account.
  *    A throwaway hash is compared against when the account is not found, so
  *    both branches pay the same ~60-90 ms.
  *
@@ -55,16 +55,16 @@ declare module "next-auth" {
 }
 
 /**
- * "Ingat saya" — how long a sign-in stays valid.
+ * "Ingat saya", how long a sign-in stays valid.
  *
  * The cookie ceiling is 30 days because that is the longest "remember me" any
- * product should honour. Auth.js reads `session.maxAge` from config only — it
- * is not per-token and not per-login — so a single config value has to be the
+ * product should honour. Auth.js reads `session.maxAge` from config only, it
+ * is not per-token and not per-login, so a single config value has to be the
  * *ceiling*, and the shorter, opt-out lifetime is enforced in the session
  * callback instead: a token issued without the tick stops validating after
  * SHORT_MAX_AGE even though the cookie itself lingers. The browser keeps a
- * cookie it can no longer use, which is harmless; the alternative — a shorter
- * cookie ceiling for everyone — would make the checkbox a lie.
+ * cookie it can no longer use, which is harmless; the alternative, a shorter
+ * cookie ceiling for everyone, would make the checkbox a lie.
  *
  * The security cost of ticking it is bounded, and the escape hatch still works:
  * bumping token_version on a password change revokes remembered sessions too,
@@ -78,7 +78,7 @@ const SHORT_MAX_AGE = 24 * 60 * 60; // 1 hari
 /**
  * A real bcrypt hash of a random 64-character hex string, so no password can
  * ever match it. Its only job is to make `compare` do the same work it would do
- * for a real user — the cost of bcrypt is in the comparison, not in knowing the
+ * for a real user, the cost of bcrypt is in the comparison, not in knowing the
  * answer. Verified at cost 10: ~63 ms, which is what a real check costs.
  */
 const DUMMY_HASH = "$2b$10$/cmSzfHvrO7AWJAwZfqSVOXi38ot.4WaOSJHUScmYic/g5aNdsVe6";
@@ -86,7 +86,7 @@ const DUMMY_HASH = "$2b$10$/cmSzfHvrO7AWJAwZfqSVOXi38ot.4WaOSJHUScmYic/g5aNdsVe6
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: {
     strategy: "jwt",
-    // The ceiling, not the default. See REMEMBER_MAX_AGE — a sign-in without
+    // The ceiling, not the default. See REMEMBER_MAX_AGE, a sign-in without
     // "ingat saya" is cut off after a day by the session callback below, which
     // is the only place in Auth.js that can vary per login.
     maxAge: REMEMBER_MAX_AGE,
@@ -111,8 +111,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           typeof credentials?.password === "string" ? credentials.password : "";
         if (!email || !password) return null;
 
-        // Only an explicit "true" opts in. Anything else — a missing field, the
-        // string "false", a hand-crafted request — is a short-lived session.
+        // Only an explicit "true" opts in. Anything else, a missing field, the
+        // string "false", a hand-crafted request, is a short-lived session.
         const rememberMe = credentials?.rememberMe === "true";
 
         const { perAccount, perIp, windowMs } = LIMITS.login;
@@ -181,7 +181,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
      *
      * Costs one extra query per session read, on a warm pooled connection in
      * the same region as the rest of the data (~35 ms measured on this
-     * deployment). The alternative — strategy: "database" — costs a query too,
+     * deployment). The alternative, strategy: "database", costs a query too,
      * and additionally puts sessions in a table that has to be pruned.
      */
     async session({ session, token }) {

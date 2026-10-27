@@ -1,4 +1,4 @@
-// Inspect database — quick data dump
+// Inspect database: quick data dump
 //
 // Rewritten for PostgreSQL. Two changes beyond the obvious async one: the
 // per-quiz counts use bound parameters instead of string-interpolating the id

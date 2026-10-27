@@ -7,7 +7,7 @@ import { Providers } from "@/components/Providers";
  * Type pairing (v4): Outfit for display, Inter for UI/body.
  *
  * v3 pointed both --font-sans and --font-display at the system stack, so
- * every heading rendered in Segoe UI / SF — the single biggest reason the
+ * every heading rendered in Segoe UI / SF, the single biggest reason the
  * app read as generic rather than designed.
  *
  * Outfit over Poppins (the usual "friendly education" pick): Poppins' very
@@ -32,14 +32,14 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "EaLearn — Buat soal latihan untuk anak, dalam 5 menit",
+  title: "EaLearn: Buat soal latihan untuk anak, dalam 5 menit",
   description:
     "Cara tercepat orang tua bikin soal latihan untuk anaknya. Multiple choice & essay, share link, lihat hasil langsung.",
   applicationName: "EaLearn",
   appleWebApp: { capable: true, title: "EaLearn", statusBarStyle: "default" },
   formatDetection: { telephone: false },
   openGraph: {
-    title: "EaLearn — Buat soal latihan untuk anak, dalam 5 menit",
+    title: "EaLearn: Buat soal latihan untuk anak, dalam 5 menit",
     description:
       "Bikin kuis pilihan ganda & essay, share link ke anak, auto-grade. Tanpa install app.",
     type: "website",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   // Was an inline data-URI SVG: a green (#4f6b3a) rounded square with a letter
   // "E" set in a system font. Two things were wrong with it. The colour was
   // from the pre-navy palette, so it did not match anything else in the app.
-  // And because it is a data: URI, it was the only icon some browsers chose —
+  // And because it is a data: URI, it was the only icon some browsers chose,
   // the rebuilt app/favicon.ico was being served correctly and never seen,
   // which is why replacing the .ico alone appeared to change nothing.
   //

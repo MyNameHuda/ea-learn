@@ -5,7 +5,7 @@ import { SettingsShell } from "@/components/SettingsShell";
 import { IconHeart, IconShield, IconZap, IconUser } from "@/components/Icon";
 
 export const metadata = {
-  title: "Tentang — EaLearn",
+  title: "Tentang EaLearn",
 };
 
 const POINTS = [
@@ -138,8 +138,8 @@ export default async function TentangPage() {
         <h4 style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>Ada yang terasa aneh?</h4>
         <p className="t-soft" style={{ fontSize: 12, margin: 0 }}>
           Kalau ada yang terasa aneh atau error, ceritakan lewat halaman{" "}
-          <span style={{ color: "var(--primary-ink)", fontWeight: 600 }}>Bantuan</span>{" "}
-          — laporan dari pengguna asli jauh lebih berguna daripada tebakan kami.
+          <span style={{ color: "var(--primary-ink)", fontWeight: 600 }}>Bantuan</span>,{" "}
+          laporan dari pengguna asli jauh lebih berguna daripada tebakan kami.
         </p>
       </div>
     </SettingsShell>

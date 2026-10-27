@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Optional image for a question — for the questions that cannot be read
+ * Optional image for a question, for the questions that cannot be read
  * without a figure: a geometry diagram, a map, a screenshot of a word problem.
  *
  * The file goes to POST /api/upload, which decides the real type from the
@@ -12,7 +12,7 @@
  * Plain <img>, not next/image. These are user uploads that are already as
  * large as they will ever be served, so the optimizer would add a config
  * surface and a resize hop without making them smaller, and a mis-sized image
- * in next/image renders as a blank box rather than a broken icon — worse for a
+ * in next/image renders as a blank box rather than a broken icon, worse for a
  * child staring at a diagram they cannot see.
  */
 import { useRef, useState } from "react";
@@ -34,7 +34,7 @@ export function QuestionImageField({
 
   async function handleFile(file: File) {
     // Check here so a 40 MB photo does not spend bandwidth to be refused
-    // server-side. The server checks again — this is convenience, not safety.
+    // server-side. The server checks again, this is convenience, not safety.
     if (file.size > MAX_MB * 1024 * 1024) {
       showToast(`Gambar maksimal ${MAX_MB} MB`, "error");
       return;

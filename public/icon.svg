@@ -5,7 +5,7 @@
 
        This is the scalable approximation; the PNG/ICO icons carry the full
        detail. It has to stand on its own because browsers that support SVG
-       icons prefer it over app/favicon.ico — an SVG left on the old design
+       icons prefer it over app/favicon.ico, an SVG left on the old design
        would have kept winning over the new raster one.
 
        At 16px the tile and the white face are all that survive; the cap, rays

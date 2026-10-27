@@ -188,5 +188,5 @@ console.log("\n=== 5. bersihkan ===");
 }
 await db.end();
 
-console.log(`\n=== ${fail === 0 ? "SEMUA LOLOS" : fail + " GAGAL"} — ${pass} pass, ${fail} fail ===`);
+console.log(`\n=== ${fail === 0 ? "SEMUA LOLOS" : fail + " GAGAL"}: ${pass} pass, ${fail} fail ===`);
 process.exit(fail === 0 ? 0 : 1);

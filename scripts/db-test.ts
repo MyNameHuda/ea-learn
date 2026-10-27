@@ -3,7 +3,7 @@
 //
 // This exists because the failure mode of a wrong connection string is a
 // timeout that looks like "the site is just slow", and because the pool is
-// built with max:1 — a settings mistake there does not show up until the
+// built with max:1, a settings mistake there does not show up until the
 // eleventh concurrent request. Both of those are worth catching before deploy.
 
 import { closePool, ensureSchema, allRows, getPool, runSql, getRow } from "../lib/db";
@@ -26,7 +26,7 @@ async function main() {
     try {
       return new URL(process.env.DATABASE_URL ?? "").host;
     } catch {
-      return "(tidak terbaca — DATABASE_URL kosong?)";
+      return "(tidak terbaca, DATABASE_URL kosong?)";
     }
   })();
   console.log(`host: ${host}\n`);
@@ -68,7 +68,7 @@ async function main() {
   let bad = 0;
   for (const r of results) {
     if (!r.ok) bad++;
-    console.log(`${r.ok ? "PASS" : "FAIL"}  ${r.name} — ${r.detail}`);
+    console.log(`${r.ok ? "PASS" : "FAIL"}  ${r.name}: ${r.detail}`);
   }
   console.log(`\n${results.length - bad}/${results.length} PASS\n`);
 

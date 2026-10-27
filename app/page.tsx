@@ -32,7 +32,7 @@ const features = [
     icon: IconShare,
     title: "Share via WhatsApp",
     desc: "Anak kerjain langsung dari link",
-    // Was a hardcoded sage (#5d7050 / #d4dfc9) — the v4 brand green, left
+    // Was a hardcoded sage (#5d7050 / #d4dfc9), the v4 brand green, left
     // behind as a literal and invisible to any palette change. Tokens now.
     color: "var(--info)",
     bg: "var(--info-soft)",
@@ -54,7 +54,7 @@ export default function HomePage() {
             alignItems: "center",
           }}
         >
-          {/* Decorative floating cards — desktop only */}
+          {/* Decorative floating cards, desktop only */}
           <div className="float-card float-card-1" style={{ display: "none" }}>
             <div
               style={{
@@ -99,7 +99,7 @@ export default function HomePage() {
             <h1 className="h-display landing-hero__title">
               Bikin soal latihan untuk anak,
               {/* The <br> is display:none on phones, so it collapses the line
-                  break AND the surrounding whitespace — without this the
+                  break AND the surrounding whitespace, without this the
                   headline rendered as "anak,dalam 5 menit." */}
               <br className="landing-hero__break" />{" "}
               <span style={{ color: "var(--primary)" }}>dalam 5 menit.</span>
@@ -110,7 +110,7 @@ export default function HomePage() {
             </p>
 
             {/* Primary CTA with the secondary directly beneath it. Side by side
-                they read as two competing actions of near-equal weight — a
+                they read as two competing actions of near-equal weight, a
                 solid green button next to a borderless ghost one is the worst
                 of both. Stacked, the outline variant is unmistakably secondary
                 without demoting it to a bare text link, and the equal width
@@ -307,7 +307,7 @@ export default function HomePage() {
                     for the title, and the numbered circle already carries the
                     "step" meaning. Restored at the tablet breakpoint.
 
-                    `display` is set by the class, NOT inline — an inline
+                    `display` is set by the class, NOT inline, an inline
                     display:flex would beat the stylesheet's display:none and
                     the icon would never hide. */}
                 <div
@@ -360,8 +360,8 @@ export default function HomePage() {
                 <IconFlask size={16} />
               </span>
               <div>
-                <strong style={{ color: "var(--text)" }}>Mode pengembangan</strong>{" "}
-                — Isi halaman ini memakai data contoh, bukan akun asli. Jalankan{" "}
+                <strong style={{ color: "var(--text)" }}>Mode pengembangan</strong>,{" "}
+                Isi halaman ini memakai data contoh, bukan akun asli. Jalankan{" "}
                 <code>npm run db:seed</code> untuk mengisi ulang.
               </div>
             </div>
@@ -392,7 +392,7 @@ export default function HomePage() {
             className="btn btn-accent"
             style={{ maxWidth: 280, margin: "0 auto" }}
           >
-            Mulai Sekarang — Gratis
+            Mulai Sekarang, Gratis
           </Link>
         </section>
       </div>

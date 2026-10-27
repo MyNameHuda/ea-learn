@@ -61,7 +61,7 @@ export default async function PlayDonePage({
   const passed = pct >= 70;
 
   // Ringkasan jawaban anak: soal, jawaban mereka sendiri, dan benar/salah.
-  // Kunci jawaban tidak pernah ikut di sini — query-nya tidak mengambilnya.
+  // Kunci jawaban tidak pernah ikut di sini, query-nya tidak mengambilnya.
   const summary = buildChildSummary(
     await getAttemptSummaryForChild(attempt.id, quiz.id),
   );
@@ -115,7 +115,7 @@ export default async function PlayDonePage({
           />
 
           {/* Was a plain "Powered by EaLearn" line of text at the bottom of the
-              screen, 11px and half-opacity — the brand was present but not
+              screen, 11px and half-opacity, the brand was present but not
               visible. The other three screens in this flow (/play/<uuid>,
               /name, /do) all open with the lockup, so this one now matches. */}
           <div className="brand-logo" style={{ color: "#fff", marginBottom: 24 }}>
@@ -240,8 +240,8 @@ export default async function PlayDonePage({
 
               Yang tidak ditampilkan: jawaban yang benar. Kalau jawabannya
               salah, di sini hanya tertulis nomornya salah. Kuncinya sendiri
-              tidak pernah masuk ke jalur ini — query getAttemptSummaryForChild()
-              tidak mengambil kolom correct_answer — sehingga tidak ada yang
+              tidak pernah masuk ke jalur ini, query getAttemptSummaryForChild()
+              tidak mengambil kolom correct_answer, sehingga tidak ada yang
               bisa bocor karena "lupa dihapus" di suatu tempat. */}
           {summary.length > 0 && (
             <section

@@ -8,8 +8,8 @@ import { IconLightbulb } from "@/components/Icon";
 /**
  * No subject presets and no age presets.
  *
- * Both used to be fixed choices — three big buttons for the subject, three for
- * the age range — with `AgeRange` typed as `"5-8" | "9-12" | "13-17"` and a
+ * Both used to be fixed choices, three big buttons for the subject, three for
+ * the age range, with `AgeRange` typed as `"5-8" | "9-12" | "13-17"` and a
  * matching z.enum on the API. The parent types both now.
  *
  * A three-item scale is the wrong shape for this: it has no room for "TK B",
@@ -26,7 +26,7 @@ const AGE_HINT = "Misalnya: 9-12 tahun, kelas 4, TK B";
  * This used to be rendered inline from a Server Component: no "use client",
  * no useState, no onChange on the inputs, no onClick on the subject/age
  * pills, and the primary "Lanjut ke Editor Soal" button had no handler at
- * all. The page looked complete and did nothing — you could not even keep a
+ * all. The page looked complete and did nothing, you could not even keep a
  * typed title, and no quiz could ever be created from the browser. The
  * subject/age selection was hardcoded to "i === 0" / "i === 1" so it only
  * ever *looked* like something was selected.
@@ -65,7 +65,7 @@ export function NewQuizForm() {
 
     // Required: age_range is NOT NULL in the schema, and a quiz with no target
     // age is not a usable worksheet. The subject column is nullable, so an
-    // empty one is allowed — a parent making a maths sheet may not think of it
+    // empty one is allowed, a parent making a maths sheet may not think of it
     // as a subject at all.
     if (!ageRange.trim()) {
       setAgeError("Isi usia target anak, misalnya 9-12 tahun.");

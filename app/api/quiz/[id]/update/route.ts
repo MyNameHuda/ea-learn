@@ -1,4 +1,4 @@
-// PATCH /api/quiz/[id]/update — Update quiz metadata
+// PATCH /api/quiz/[id]/update: Update quiz metadata
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/lib/auth";

@@ -3,7 +3,7 @@
 /**
  * Notification + privacy preferences.
  *
- * Each toggle saves on change — no separate "Simpan" button to forget — and
+ * Each toggle saves on change, no separate "Simpan" button to forget, and
  * reverts the switch if the request fails, so the UI never claims a setting
  * that was not actually stored.
  */

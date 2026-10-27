@@ -1,5 +1,5 @@
 /**
- * PostgreSQL connection — Neon or Supabase.
+ * PostgreSQL connection: Neon or Supabase.
  *
  * ── Why this file exists at all ──────────────────────────────────────────────
  * It used to be a `node:sqlite` singleton over a local file. That cannot work
@@ -16,9 +16,9 @@
  * * Timestamps stay TEXT, not TIMESTAMPTZ. The app writes ISO strings via
  *   `now()` and reads them back as strings; switching the column type would
  *   hand `pg` a Date object where the code expects a string, and that failure
- *   is silent — it shows up as a wrong "2 days ago" much later.
+ *   is silent, it shows up as a wrong "2 days ago" much later.
  * * `?` placeholders are unchanged in every query in lib/queries/data.ts.
- *   node-postgres does NOT understand them — it forwards the text to the
+ *   node-postgres does NOT understand them, it forwards the text to the
  *   server, which answers `syntax error at or near ","`. The conversion to
  *   $1/$2 happens in the helpers below (see toDollarPlaceholders), so those
  *   queries are correct as written.
@@ -34,7 +34,7 @@ import { randomBytes, randomUUID } from "node:crypto";
 /**
  * Postgres returns int8 (OID 20) as a STRING, because 64-bit integers do not
  * fit in a JS number for every value. Left alone, `SUM(points)` and any large
- * count arrive as "10000" and then break arithmetic silently — a string
+ * count arrive as "10000" and then break arithmetic silently, a string
  * concatenated to a number works, a number divided by one does not. int2 and
  * int4 are parsed correctly out of the box; only int8 needs this.
  */
@@ -43,8 +43,8 @@ types.setTypeParser(20, (v) => Number(v));
 /**
  * Where the pooled connection lives, with an actionable failure.
  *
- * Failing here at import time is deliberate. The alternative — defaulting to
- * some local path — is what made the SQLite version look healthy on a machine
+ * Failing here at import time is deliberate. The alternative, defaulting to
+ * some local path, is what made the SQLite version look healthy on a machine
  * that was not the machine it would run on.
  */
 function connectionString(): string {
@@ -59,7 +59,7 @@ function connectionString(): string {
         "  Supabase → Project Settings → Database → Connection string → URI",
         "",
         "Untuk pengembangan lokal, buat database kosong di salah satu dari",
-        "keduanya juga bisa — tidak perlu layanan berbayar.",
+        "keduanya juga bisa, tidak perlu layanan berbayar.",
       ].join("\n"),
     );
   }
@@ -90,7 +90,7 @@ function createPool(): Pool {
     connectionTimeoutMillis: 15_000,
     // Neon and Supabase both require TLS; the URL carries sslmode, and this is
     // the belt to that suspenders. pgv8 rejects self-signed certs by default,
-    // which is correct — do not disable it to silence a connection error.
+    // which is correct, do not disable it to silence a connection error.
     ssl: process.env.DATABASE_SSL === "false" ? false : { rejectUnauthorized: false },
   });
 
@@ -108,7 +108,7 @@ function createPool(): Pool {
  *
  * This is not just tidiness. `next build` imports every route module to collect
  * page data, so a pool created at import time means the build needs a live
- * database — it fails on a machine without one, and on Vercel it would connect
+ * database, it fails on a machine without one, and on Vercel it would connect
  * to production from the build step. The failure message above is still
  * actionable; it just arrives when a query actually runs, which is the only
  * moment it is relevant.
@@ -161,13 +161,13 @@ const SCHEMA_SQL = `
 
   -- Bumped every time the password changes. A JWT does not consult the
   -- database, so without this a session issued before a password change stays
-  -- valid for its whole lifetime — which means a parent who resets a leaked
+  -- valid for its whole lifetime, which means a parent who resets a leaked
   -- password cannot actually lock the thief out. See lib/auth.ts.
   ALTER TABLE users ADD COLUMN IF NOT EXISTS token_version INTEGER NOT NULL DEFAULT 0;
 
   -- Rate limiting counters. Shared across every lambda instance, which an
   -- in-memory Map could not be. expires_at is the instant the window closes,
-  -- not the instant it opened — see the note in lib/rate-limit.ts.
+  -- not the instant it opened, see the note in lib/rate-limit.ts.
   CREATE TABLE IF NOT EXISTS rate_limits (
     key        TEXT PRIMARY KEY,
     hits       INTEGER NOT NULL,
@@ -269,8 +269,8 @@ let schemaPromise: Promise<void> | null = null;
  * Creates the tables once per process, and every query waits for it.
  *
  * This is wired into the query helpers rather than left to the scripts. A
- * hosted database is created empty — the `CREATE TABLE` only ever ran when
- * someone remembered to run `db:seed` — so a first deploy on a fresh Neon or
+ * hosted database is created empty, the `CREATE TABLE` only ever ran when
+ * someone remembered to run `db:seed`, so a first deploy on a fresh Neon or
  * Supabase project would have come up green and then failed every page with
  * `relation "users" does not exist`. The promise is memoised, so after the
  * first query this is an await on an already-resolved value.
@@ -279,8 +279,8 @@ export function ensureSchema(): Promise<void> {
   if (!schemaPromise) {
     schemaPromise = getPool()
       .query(SCHEMA_SQL)
-      // Counters whose window has closed can never be read again by `hit()` —
-      // it resets them on the next conflict — so they are pure garbage. Pruned
+      // Counters whose window has closed can never be read again by `hit()`,
+      // it resets them on the next conflict, so they are pure garbage. Pruned
       // once per process rather than per request: ensureSchema is memoised, so
       // this runs on cold start, which is exactly as often as it needs to be.
       .then(() => {
@@ -304,7 +304,7 @@ export type SQLInputValue = string | number | boolean | null | Date | Buffer;
  * Rewrites `?` placeholders into Postgres's `$1, $2, …`
  *
  * node-postgres does NOT accept `?`. It passes the text to the server
- * verbatim, and the server answers `syntax error at or near ","` — which is
+ * verbatim, and the server answers `syntax error at or near ","`, which is
  * exactly what the first `db:test` against a real Neon database reported.
  *
  * Converting here rather than rewriting all 54 queries in lib/queries/data.ts
@@ -412,7 +412,7 @@ export async function getRow<T = unknown>(
 /**
  * Mirrors the old SQLite result shape.
  *
- * Only `changes` was ever read — nothing used `lastInsertRowid`, because ids
+ * Only `changes` was ever read, nothing used `lastInsertRowid`, because ids
  * are cuid-style strings generated in application code, not serial columns.
  */
 export async function runSql(
@@ -430,7 +430,7 @@ export async function runSql(
 /**
  * A transaction. Postgres needs one where SQLite's single connection made it
  * implicit, and it is the only way to batch several statements on one
- * connection — with `max: 1` there is no second connection to be interleaved.
+ * connection, with `max: 1` there is no second connection to be interleaved.
  *
  * The client handed to the callback is a raw pg client, so it does NOT go
  * through toDollarPlaceholders. Call `client.query(toDollarPlaceholders(sql), …)`
@@ -479,7 +479,7 @@ export function cuid(): string {
 /**
  * The secret half of a share link: /play/<token> is the only thing standing
  * between a parent's quiz and anybody who has the URL, and the child who opens
- * it has no account and no session. 32 bytes from the OS CSPRNG — 256 bits,
+ * it has no account and no session. 32 bytes from the OS CSPRNG, 256 bits,
  * which is not a number anyone brute-forces, and unlike the old id it carries
  * no timestamp to read back.
  */

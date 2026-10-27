@@ -30,7 +30,7 @@ export function timeAgoID(iso: string | null | undefined): string {
 export function durationFromMs(ms: number): string | null {
   if (!Number.isFinite(ms) || ms < 5_000) return null;
   // Under a minute, minutes round to "0 menit", which looks broken. Show
-  // seconds instead — "42 detik" is the honest reading for a quick quiz.
+  // seconds instead, "42 detik" is the honest reading for a quick quiz.
   if (ms < 60_000) return `${Math.round(ms / 1000)} detik`;
   const totalMinutes = Math.round(ms / 60_000);
   if (totalMinutes < 60) return `${totalMinutes} menit`;

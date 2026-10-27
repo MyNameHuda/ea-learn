@@ -28,7 +28,7 @@ export default async function ShareQuizPage({
    *
    * Halaman ini dulu selalu menampilkan "Kuis siap dishare!" plus link-nya,
    * apa pun status kuis. Padahal /play/<uuid> hanya terbuka untuk kuis
-   * berstatus "ready" — jadi orang tua mengambil link dari sini,
+   * berstatus "ready", jadi orang tua mengambil link dari sini,
    * mengirimnya ke anak, dan anak mendapat 404. Tidak ada yang memberi tahu
    * ke mana masalahnya, dan kuisnya sendiri terlihat "siap".
    *
@@ -36,7 +36,7 @@ export default async function ShareQuizPage({
    * masih draft, yang ditampilkan adalah alasannya dan tombol untuk
    * mempublikasikannya.
    *
-   * The QR block that used to live here was `qr-placeholder` — a decorative
+   * The QR block that used to live here was `qr-placeholder`, a decorative
    * checkerboard with two fake finder squares and the caption "Scan QR atau
    * copy link di bawah". It was not a QR code and never encoded the link, so
    * it actively invited a scan that could only fail. Removed in favour of

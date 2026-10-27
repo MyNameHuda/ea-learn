@@ -27,8 +27,8 @@ export default async function QuizEditPage({
 
   const rawQuestions = await listQuizQuestions(id);
   // `imageUrl` is included here because this projection is written by hand.
-  // Leaving it out did not fail the build — a QuizQuestion without the field is
-  // still a valid QuizQuestion, since imageUrl is optional — it just quietly
+  // Leaving it out did not fail the build, a QuizQuestion without the field is
+  // still a valid QuizQuestion, since imageUrl is optional, it just quietly
   // showed the editor's "tambah gambar" picker for a question that already had
   // a picture, and any pick replaced it. A hand-written field list is a trap:
   // adding a field to the row and the type is not enough, every place that

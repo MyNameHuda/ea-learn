@@ -12,7 +12,7 @@
  * kelas 11" are all real answers that the union rejected.
  *
  * The column has always been TEXT with no CHECK constraint, so widening the
- * type is backward compatible — existing rows keep their values untouched.
+ * type is backward compatible, existing rows keep their values untouched.
  */
 export type AgeRange = string;
 

@@ -14,7 +14,7 @@ import {
 import { timeAgoID } from "@/lib/utils";
 
 /**
- * /hasil — the cross-quiz results overview.
+ * /hasil: the cross-quiz results overview.
  *
  * The topbar's "Hasil" item pointed at `/dashboard#hasil`, and no element with
  * that id exists anywhere in the app, so the nav item scrolled nowhere. There
@@ -190,8 +190,8 @@ export default async function HasilPage() {
                                   <span>{r.subject ?? "Tanpa mapel"}</span>
                                   <span style={{ color: "var(--text-muted)" }}>·</span>
                                   {/* No " tahun" appended. The age is now
-                                      whatever the parent typed — "9-12",
-                                      "kelas 4", "TK B" — so a hardcoded
+                                      whatever the parent typed, "9-12",
+                                      "kelas 4", "TK B", so a hardcoded
                                       unit would read "kelas 4 tahun". */}
                                   <span>{r.ageRange}</span>
                                 </div>
@@ -235,7 +235,7 @@ export default async function HasilPage() {
                               </div>
                               <div>
                                 <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text)" }}>
-                                  {r.avgPct ?? "—"}%
+                                  {r.avgPct ?? "-"}%
                                 </div>
                                 <div className="t-soft" style={{ fontSize: 10 }}>
                                   Rata-rata
@@ -335,8 +335,8 @@ export default async function HasilPage() {
                             </div>
                             <div className="t-soft" style={{ fontSize: 11 }}>
                               {r.status === "ready"
-                                ? "Sudah dibagikan — belum dikerjakan"
-                                : "Masih draft — share dulu ke anak"}
+                                ? "Sudah dibagikan, belum dikerjakan"
+                                : "Masih draft, share dulu ke anak"}
                             </div>
                           </div>
                           <span

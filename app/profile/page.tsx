@@ -99,7 +99,7 @@ export default async function ProfilePage() {
           {/* The "Anak-anak" section was removed. The child's name is typed by
               the child themselves on /play/<uuid>/name when they start a quiz,
               so a parent-side profile of them was a second place to maintain
-              the same fact — and it was routinely stale, because nothing there
+              the same fact, and it was routinely stale, because nothing there
               wrote back to the attempt rows. Attempt results are the real
               record of who took a quiz. */}
 

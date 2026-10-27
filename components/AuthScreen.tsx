@@ -4,7 +4,7 @@
  * The login / signup screen: one centred column, nothing else.
  *
  * This used to be a two-column split screen. The left column was a marketing
- * panel — gradient, a 32px headline, three benefit lines — and on a phone it
+ * panel, gradient, a 32px headline, three benefit lines, and on a phone it
  * was pushed above the form, so the first thing a person saw was decoration
  * and the first thing they had to scroll past to reach the actual fields was
  * more decoration. The panel also gave the error toast a dark surface to land

@@ -4,13 +4,13 @@ import { z } from "zod";
 import { createUser, getUserByEmail } from "@/lib/queries/data";
 
 /**
- * POST /api/auth/signup — create an account.
+ * POST /api/auth/signup: create an account.
  *
  * No verification code is sent, on purpose. The code round-trip used to exist
  * to prove the person controlled the address they had just typed; it proved
  * nothing beyond what the password login itself would prove on the first real
  * use, and it was a way to lock yourself out of an account you had just made.
- * Account recovery is handled by a human instead — see components/ContactSupport.
+ * Account recovery is handled by a human instead, see components/ContactSupport.
  *
  * The response always carries `fieldErrors`, keyed by input name, so the form
  * can put each message on the field that caused it rather than in one banner.
@@ -21,7 +21,7 @@ import { createUser, getUserByEmail } from "@/lib/queries/data";
  * are the ones with an account. It now answers 201 with the same body either
  * way, and the message is written to be true in both cases.
  *
- * The cost is real — someone who mistypes into an address that already exists
+ * The cost is real, someone who mistypes into an address that already exists
  * will not be told so, and will find out at the login screen. That is the
  * standard trade for not publishing the user list, and the alternative here
  * was publishing it.

@@ -1,4 +1,4 @@
-// GET /api/play/fetch?attempt=xxx&q=N — Fetch question N for an attempt
+// GET /api/play/fetch?attempt=xxx&q=N: Fetch question N for an attempt
 import { NextResponse } from "next/server";
 import { getAttemptById, listQuizQuestions, getAnswerByQ } from "@/lib/queries/data";
 import { getQuizByShareUuid, getQuizById } from "@/lib/queries/data";
@@ -18,7 +18,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
     }
     if (attempt.status !== "in_progress") {
-      // Already submitted — treat as done
+      // Already submitted, treat as done
       return NextResponse.json({ done: true, attemptId });
     }
 
@@ -47,11 +47,11 @@ export async function GET(req: Request) {
         prompt: question.prompt,
         options: question.options,
         points: question.points,
-        // A diagram is part of the question, not a hint — the child has to see
+        // A diagram is part of the question, not a hint, the child has to see
         // it to answer. Sent here rather than fetched separately so the
         // question screen renders in one round-trip.
         imageUrl: question.imageUrl ?? null,
-        // How many answers are correct — never *which* ones. The editor now
+        // How many answers are correct, never *which* ones. The editor now
         // authors a single correct answer, but this endpoint must stay correct
         // for questions stored before that, where a key can hold several
         // indices, and grading requires an exact set match.

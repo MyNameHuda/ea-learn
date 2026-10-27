@@ -1,5 +1,5 @@
 /**
- * Data access layer — CRUD operations for all entities.
+ * Data access layer: CRUD operations for all entities.
  * Wraps raw SQL with type-safe inputs/outputs.
  */
 
@@ -61,7 +61,7 @@ export async function createUser(data: {
     ],
   );
   /* Was `return getUserById(id)!`. The non-null assertion was there because
-     the SQLite version was synchronous and could not return a Promise — with
+     the SQLite version was synchronous and could not return a Promise, with
      pg the call is async, and `!` on a Promise is both a lie and the reason
      TypeScript rejects the assignment to a UserRow return type. */
   return (await getUserById(id)) as UserRow;
@@ -177,7 +177,7 @@ export async function getAttemptStats(
  * Per-attempt answer tally for the results timeline.
  *
  * Correctness is read off the grade already stored on each answer rather than
- * re-comparing the selected indices to the correct ones in SQL — JSON arrays
+ * re-comparing the selected indices to the correct ones in SQL, JSON arrays
  * are not comparable in SQLite, and the grader has already done the work.
  * `final_score` wins over `auto_score` because a parent may have overridden an
  * essay after auto-grading.
@@ -209,7 +209,7 @@ export async function getQuizAttemptBreakdowns(quizId: string): Promise<AttemptB
 /**
  * How each question fared across every attempt on the quiz.
  *
- * This is the "soal mana yang paling sering dikeluarin" signal — a parent with
+ * This is the "soal mana yang paling sering dikeluarin" signal, a parent with
  * 2 attempts learns nothing from a score total, but immediately sees that one
  * specific question is the sticking point. Questions never attempted are kept
  * with answered = 0 rather than dropped.
@@ -257,7 +257,7 @@ export async function getQuizQuestionPerformance(quizId: string): Promise<Questi
 }
 
 /**
- * Per-quiz results rollup for the /hasil overview — the page the topbar's
+ * Per-quiz results rollup for the /hasil overview, the page the topbar's
  * "Hasil" item was pointing at. That link used to be `/dashboard#hasil`, an
  * anchor that exists nowhere in the app, so the topbar item led nowhere.
  *
@@ -688,7 +688,7 @@ export async function getAnswersForAttempt(attemptId: string): Promise<AnswerRes
  * Sengaja TIDAK mengambil `correct_answer` maupun `keywords`. Kunci jawaban
  * tidak pernah dibutuhkan di sisi anak, dan dengan tidak mengambil kolom itu
  * dari database, kebocoran tidak mungkin terjadi karena "lupa dihapus dari
- * respons" — kolomnya memang tidak pernah ikut terbawa sama sekali.
+ * respons", kolomnya memang tidak pernah ikut terbawa sama sekali.
  *
  * Yang dikembalikan sudah cukup untuk dua hal: menampilkan jawaban anak
  * sendiri, dan menentukan apakah jawaban itu benar. Untuk soal PG itu berarti
@@ -696,7 +696,7 @@ export async function getAnswersForAttempt(attemptId: string): Promise<AnswerRes
  * mereview, jadi final_score yang dipakai.
  *
  * LEFT JOIN dari questions ke answers supaya soal yang dilewati anak tetap
- * muncul di daftarnya, dengan jawaban null — bukan hilang dari daftar.
+ * muncul di daftarnya, dengan jawaban null, bukan hilang dari daftar.
  */
 export type ChildAnswerRow = {
   questionId: string;
@@ -763,7 +763,7 @@ export async function getAnswersWithQuestionsForAttempt(
     // Built with mapQuestion rather than a hand-written field list.
     //
     // The list that was here spelled out every column by hand, and it silently
-    // omitted image_url — so the review screen showed a question with a figure
+    // omitted image_url, so the review screen showed a question with a figure
     // and no figure. Nothing warned about it: `as unknown as QuestionRow` makes
     // any shape legal. Reusing the shared mapper means a column added to the
     // questions table reaches this path without anyone remembering to edit a
@@ -812,11 +812,11 @@ export async function getAnswerByQ(attemptId: string, questionId: string): Promi
 
 export async function finalizeAttemptScore(attemptId: string, totalScore: number) {
   // `submitted_at` is recorded here and NOT in submitAttempt(), which nothing
-  // ever called — so every attempt in the DB had submitted_at = NULL. That is
+  // ever called, so every attempt in the DB had submitted_at = NULL. That is
   // why the results page showed no timestamps and no completion time, and why
   // `ORDER BY submitted_at DESC` (listAttempts) had nothing to sort by.
   //
-  // COALESCE matters: finalizeAttemptScore is called twice per attempt —
+  // COALESCE matters: finalizeAttemptScore is called twice per attempt,
   // once on the child's submit (autoGradeAttempt) and again whenever a parent
   // reviews an essay later (reviewEssayAnswer). A plain assignment would let
   // that later review overwrite the real submit time, and the duration would
@@ -846,7 +846,7 @@ export async function updateUserPassword(userId: string, passwordHash: string) {
  * Invalidate every session issued before this call.
  *
  * The session is a JWT, so changing password_hash does nothing to cookies that
- * are already in the wild — they keep working until they expire, 30 days
+ * are already in the wild, they keep working until they expire, 30 days
  * later. Bumping token_version makes the mismatch detectable: a token minted
  * with the old number no longer matches the row, and lib/auth.ts treats the
  * session as signed out.

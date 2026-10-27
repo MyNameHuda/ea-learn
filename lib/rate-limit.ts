@@ -49,7 +49,7 @@ function windowEnds(windowMs: number): string {
  *
  * ── The window is measured from the first hit, not from the last ─────────────
  * The first version compared `window_start < now` and reset the counter when
- * that was true. It is *always* true, because time only ever moves forward —
+ * that was true. It is *always* true, because time only ever moves forward,
  * so every single call reset `hits` to 1 and the limiter permitted everything.
  * The test caught it immediately: 8 attempts against a limit of 5, all 8
  * allowed, counter reading 1 every time. The column now holds the moment the
@@ -68,7 +68,7 @@ function windowEnds(windowMs: number): string {
  *
  * This is a fixed window, not a sliding one: a caller can spend a full
  * budget just before expiry and another just after. That doubles the worst
- * case burst and is the accepted trade for one row and one query — a sliding
+ * case burst and is the accepted trade for one row and one query, a sliding
  * log would cost an insert per request to fix a bound that is already fine
  * for "stop someone guessing a password 8 times".
  */
@@ -133,7 +133,7 @@ const HOUR = 60 * MINUTE;
  *
  * The login numbers are the ones that matter. `perAccount` counts only FAILED
  * attempts, so a parent who signs in ten times in an afternoon is never locked
- * out of their own account — only someone guessing that password slowly is.
+ * out of their own account, only someone guessing that password slowly is.
  * `perIp` counts every attempt, because spraying one password across many
  * accounts produces no per-account failures and would otherwise walk straight
  * through.

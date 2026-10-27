@@ -1,4 +1,4 @@
-// POST /api/upload — store an image for a question.
+// POST /api/upload: store an image for a question.
 //
 // Images are the first thing this app accepts from users, so the file handling
 // is written as if it were hostile input, because one day it will be:
@@ -33,7 +33,7 @@ const FOLDER = "ealearn/questions";
 
 /**
  * Cloudinary is used when all three credentials are present, which is what
- * happens in production. Without them — local development — the route falls
+ * happens in production. Without them, local development, the route falls
  * back to the filesystem.
  */
 function cloudinaryConfigured(): boolean {
@@ -137,7 +137,7 @@ export async function POST(req: Request) {
   }
 
   // Random name, correct extension. The original filename is discarded
-  // entirely — it is the one piece of this input with no safe interpretation.
+  // entirely, it is the one piece of this input with no safe interpretation.
   const name = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}.${kind.ext}`;
 
   if (cloudinaryConfigured()) {

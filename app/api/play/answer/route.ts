@@ -1,4 +1,4 @@
-// POST /api/play/answer — Save answer for a question
+// POST /api/play/answer: Save answer for a question
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {

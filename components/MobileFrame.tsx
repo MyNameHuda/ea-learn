@@ -1,5 +1,5 @@
 /**
- * ResponsiveShell — wraps page content.
+ * ResponsiveShell: wraps page content.
  * Mobile: max-width 480px shell with bg.
  * Desktop: max-width 1200px wide layout (used by pages).
  */

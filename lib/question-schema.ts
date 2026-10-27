@@ -2,7 +2,7 @@
  * Question validation, shared by the create and update endpoints.
  *
  * These lived inline in the POST route only, which left PATCH taking a raw
- * body straight into updateQuestion() with no checks at all — and PATCH is the
+ * body straight into updateQuestion() with no checks at all, and PATCH is the
  * path the editor uses every time the answer key changes on blur. An invariant
  * that only the "add" route enforces is not an invariant.
  */
@@ -16,7 +16,7 @@ import { z } from "zod";
  *
  * The ceiling matters. Grading requires the child's answer to match the key
  * exactly, so a key with two indices is a question a child cannot get right
- * unless they happen to know both are correct — and nothing on the child's
+ * unless they happen to know both are correct, and nothing on the child's
  * screen would ever tell them. The editor used to offer a checkbox, which
  * invited exactly that by accident.
  */
@@ -41,16 +41,16 @@ const correctAnswer = z
  * The extension whitelist mirrors the magic-byte check in /api/upload, so a
  * hand-crafted request cannot land an .svg here and have it rendered inline.
  * `javascript:` and `data:` are excluded by requiring either a single leading
- * slash or an https:// origin — neither scheme can be dressed up to match.
+ * slash or an https:// origin, neither scheme can be dressed up to match.
  */
 const IMAGE_EXT = String.raw`(?:png|jpg|jpeg|gif|webp)`;
 
 /**
  * "Tidak ada gambar" punya dua bentuk, dan keduanya harus bisa lewat.
  *
- * null  — dipakai QuestionImageField saat tombol "Hapus" ditekan, dan dipakai
+ * null  : dipakai QuestionImageField saat tombol "Hapus" ditekan, dan dipakai
  *         editor saat menyimpan soal yang memang tidak punya gambar.
- * ""    — bentuk lain dari "tidak ada gambar", untuk klien yang mengirim
+ * ""    : bentuk lain dari "tidak ada gambar", untuk klien yang mengirim
  *         string kosong alih-alih null.
  *
  * Keduanya berarti "kosongkan kolom ini". Absen (undefined) tetap berarti
@@ -59,7 +59,7 @@ const IMAGE_EXT = String.raw`(?:png|jpg|jpeg|gif|webp)`;
  *
  * ── Bug yang diperbaiki di sini ──────────────────────────────────────────────
  * Skema ini dulu hanya menerima string atau undefined. Sementara itu editor
- * selalu mengirim `imageUrl: updated.imageUrl ?? null` — null setiap kali
+ * selalu mengirim `imageUrl: updated.imageUrl ?? null`, null setiap kali
  * soal tidak punya gambar. Akibatnya SETIAP penyimpanan soal tanpa gambar
  * ditolak dengan 400 "Invalid input" pada field imageUrl, dan karena
  * updateQuestion() tidak pernah sampai dipanggil, teks soal tidak pernah

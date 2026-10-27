@@ -8,7 +8,7 @@
  * scroll past every question. This puts the whole set on the card itself.
  *
  * It has to be a client component because delete is a fetch + router.refresh,
- * and it has to sit OUTSIDE the card's <Link> — a <button> inside an <a> is
+ * and it has to sit OUTSIDE the card's <Link>, a <button> inside an <a> is
  * invalid HTML and swallows the click.
  */
 import { useState, useTransition } from "react";

@@ -1,4 +1,4 @@
-// DELETE /api/quiz/[id]/delete — Delete a quiz
+// DELETE /api/quiz/[id]/delete: Delete a quiz
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { getQuizById, getUserById, deleteQuiz } from "@/lib/queries/data";

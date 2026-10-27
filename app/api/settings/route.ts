@@ -1,4 +1,4 @@
-// PATCH /api/settings — persist notification + privacy preferences.
+// PATCH /api/settings: persist notification + privacy preferences.
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/lib/auth";

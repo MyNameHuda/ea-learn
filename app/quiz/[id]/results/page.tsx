@@ -201,7 +201,7 @@ export default async function ResultsPage({
                 style={{ padding: 14, textAlign: "center" }}
               >
                 <div style={{ fontSize: 22, fontWeight: 800, color: "var(--primary-dark)" }}>
-                  {stats.avgScore ?? "—"}
+                  {stats.avgScore ?? "-"}
                 </div>
                 <div className="t-soft">Rata-rata</div>
               </div>
@@ -216,7 +216,7 @@ export default async function ResultsPage({
               </div>
 
               {/* Completion time was un-showable until finalizeAttemptScore
-                  started writing submitted_at — every attempt had NULL there,
+                  started writing submitted_at, every attempt had NULL there,
                   so the whole column of "kapan" and "berapa lama" was blank. */}
               {fastestMs !== null && (
                 <div
@@ -235,7 +235,7 @@ export default async function ResultsPage({
                     }}
                   >
                     <IconClock size={18} />
-                    {durationFromMs(fastestMs) ?? "—"}
+                    {durationFromMs(fastestMs) ?? "-"}
                   </div>
                   <div className="t-soft">Tercepat</div>
                 </div>
@@ -257,7 +257,7 @@ export default async function ResultsPage({
                     }}
                   >
                     <IconClock size={18} />
-                    {durationFromMs(slowestMs) ?? "—"}
+                    {durationFromMs(slowestMs) ?? "-"}
                   </div>
                   <div className="t-soft">Terlambat</div>
                 </div>
@@ -460,7 +460,7 @@ export default async function ResultsPage({
                       </div>
                       {/* The whole row opens the per-question breakdown.
                           This card used to be a plain <div>, which left
-                          /quiz/<id>/results/<attempt> completely unreachable —
+                          /quiz/<id>/results/<attempt> completely unreachable,
                           the page existed and rendered fine, but nothing in
                           the app linked to it, so a parent could only ever see
                           the score total, never what the child actually
@@ -582,7 +582,7 @@ export default async function ResultsPage({
             </section>
           )}
 
-          {/* Per-question difficulty — the part a score total can never tell
+          {/* Per-question difficulty, the part a score total can never tell
               you. With two attempts you learn nothing from "33%", but you
               immediately learn which specific question is the sticking point
               and what to re-teach. */}
@@ -712,7 +712,7 @@ export default async function ResultsPage({
                           <span style={{ display: "flex", flexShrink: 0, marginTop: 1 }}>
                             <IconAlertTriangle size={13} />
                           </span>
-                          <span>Soal ini paling sering dikeluarin — cocok buat dibahas bareng.</span>
+                          <span>Soal ini paling sering dikeluarin, cocok buat dibahas bareng.</span>
                         </div>
                       )}
                     </div>

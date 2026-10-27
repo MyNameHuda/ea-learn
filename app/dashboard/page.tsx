@@ -49,7 +49,7 @@ export default async function DashboardPage() {
 
   const quizzes = await listQuizzes(user.id);
 
-  // Was the literal string "Halo, Bunda Rina" — the seed account's name,
+  // Was the literal string "Halo, Bunda Rina", the seed account's name,
   // hardcoded into the greeting. Every account saw it, including a brand-new
   // signup that had never heard of Rina. Use the first word of the name the
   // person typed, falling back to the mailbox's local part so a blank
@@ -234,7 +234,7 @@ export default async function DashboardPage() {
                   const stats = quizStats.get(q.id) ?? { questions: 0, attempts: 0 };
                   return (
                     /* Not a <Link> wrapper: the CRUD row below contains real
-                       buttons, and a <button> inside an <a> is invalid HTML —
+                       buttons, and a <button> inside an <a> is invalid HTML,
                        the browser swallows the click. The card itself is a
                        plain surface and the title is the clickable target. */
                     <div
@@ -299,7 +299,7 @@ export default async function DashboardPage() {
                               textOverflow: "ellipsis",
                               whiteSpace: "nowrap",
                               marginBottom: 4,
-                              /* Was minHeight: 22 — the measured tap target,
+                              /* Was minHeight: 22, the measured tap target,
                                  which is half the 44px minimum and about the
                                  size of a text line. The row it sits in is a
                                  single tap away from opening the results, so
@@ -378,8 +378,8 @@ export default async function DashboardPage() {
 
                   Two problems, both invisible until you clicked it:
 
-                  1. With no attempt yet — a brand-new account, or one whose
-                     child has not finished a quiz — the href was "/dashboard",
+                  1. With no attempt yet, a brand-new account, or one whose
+                     child has not finished a quiz, the href was "/dashboard",
                      the page you were already on. A tile that renders, looks
                      clickable, and does nothing.
                   2. When an attempt did exist it went to a single quiz's
@@ -387,7 +387,7 @@ export default async function DashboardPage() {
 
                   /hasil is the cross-quiz results overview, it is reachable
                   from the bottom nav under the same name, and it has a real
-                  empty state — so it answers the promise in both cases.
+                  empty state, so it answers the promise in both cases.
                   The label follows the destination: /hasil lists everything,
                   so "Hasil Terbaru" would be a claim it cannot keep. */}
               <QuickAction
@@ -546,7 +546,7 @@ function StatChip({
  * A section title with an optional count pill.
  *
  * The `linkText` prop it used to take is gone. It rendered a "Lihat semua →"
- * link hardcoded to href="/dashboard" — the page it was already on — so it was
+ * link hardcoded to href="/dashboard", the page it was already on, so it was
  * a link that did nothing. There is also no separate all-quizzes page to send
  * it to, and the grid below already renders every quiz in the section with no
  * slice, so nothing was hidden for it to reveal. A link that goes nowhere is

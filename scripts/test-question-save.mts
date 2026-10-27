@@ -7,7 +7,7 @@
  * ── Blind spot yang ditutup test ini ────────────────────────────────────────
  * Test sebelumnya (test-editor-image.mjs) selalu mengunggah gambar dulu, lalu
  * memverifikasi image_url masuk database. Itu membuat imageUrl berupa string
- * URL — dan string URL-nya lolos validasi. Tidak ada satu pun test yang
+ * URL, dan string URL-nya lolos validasi. Tidak ada satu pun test yang
  * mencoba menyimpan soal tanpa gambar.
  *
  * Padahal editor SELALU mengirim `imageUrl: updated.imageUrl ?? null`, jadi
@@ -215,5 +215,5 @@ console.log("\n=== 6. bersihkan ===");
 }
 await db.end();
 
-console.log(`\n=== ${fail === 0 ? "SEMUA LOLOS" : fail + " GAGAL"} — ${pass} pass, ${fail} fail ===`);
+console.log(`\n=== ${fail === 0 ? "SEMUA LOLOS" : fail + " GAGAL"}: ${pass} pass, ${fail} fail ===`);
 process.exit(fail === 0 ? 0 : 1);

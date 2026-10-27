@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * ShareActions — the interactive half of /quiz/[id]/share.
+ * ShareActions: the interactive half of /quiz/[id]/share.
  *
  * This used to be rendered inline from a Server Component. No "use client", no
  * state, and every button was dead: "Copy Link" did nothing on tap and the six
@@ -100,7 +100,7 @@ export default function ShareActions({ shareUrl, title }: Props) {
       return;
     }
     setCopied(false);
-    flash("Browser menolak copy otomatis — blok link di bawah, lalu salin manual.");
+    flash("Browser menolak copy otomatis, blok link di bawah, lalu salin manual.");
   }, [shareUrl, flash, legacyCopy]);
 
   const nativeShare = useCallback(async () => {
@@ -137,16 +137,16 @@ export default function ShareActions({ shareUrl, title }: Props) {
     {
       name: "Email",
       icon: IconMail,
-      color: "#2a63b8", // Email — brand blue; literal because the tile
+      color: "#2a63b8", // Email: brand blue; literal because the tile
       // tint below is built as `${c.color}1a`, which a var() cannot do.
       href: `mailto:?subject=${encodeURIComponent(`Kuis latihan: ${title}`)}&body=${encodeURIComponent(message)}`,
     },
     {
       name: "SMS",
       icon: IconShare,
-      color: "#8a6313", // SMS — accent ink, same literal-hex reason
+      color: "#8a6313", // SMS: accent ink, same literal-hex reason
       // iOS wants `sms:<body>`, Android wants `sms:?body=<body>`.
-      href: `sms:${encodeURIComponent(`${title} — ${shareUrl}`)}`,
+      href: `sms:${encodeURIComponent(`${title}: ${shareUrl}`)}`,
     },
   ];
 
@@ -163,7 +163,7 @@ export default function ShareActions({ shareUrl, title }: Props) {
         Bagikan ke anak
       </button>
 
-      {/* The link itself — always visible, always selectable. */}
+      {/* The link itself, always visible, always selectable. */}
       <div
         style={{
           marginTop: 16,
@@ -217,7 +217,7 @@ export default function ShareActions({ shareUrl, title }: Props) {
         </p>
       )}
 
-      {/* Channel tiles — each opens a real share target. */}
+      {/* Channel tiles, each opens a real share target. */}
       <h3
         style={{
           fontSize: 14,

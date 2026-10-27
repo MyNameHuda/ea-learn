@@ -3,13 +3,13 @@ import type { NextConfig } from "next";
 /**
  * Production configuration for the EaLearn deployment.
  *
- * The file was empty, which is not neutral — every value below was a decision
+ * The file was empty, which is not neutral, every value below was a decision
  * that was never made, and two of them defaulted to something worth naming.
  *
  * Deployment shape: serverless functions on Vercel, region `sin1` (see
  * vercel.json), talking to Postgres on Neon over the pooled connection, with
  * question images on Cloudinary. There is no local database file and no local
- * upload directory in production — both would be read-only or thrown away
+ * upload directory in production, both would be read-only or thrown away
  * between invocations.
  */
 const isDev = process.env.NODE_ENV !== "production";
@@ -19,7 +19,7 @@ const isDev = process.env.NODE_ENV !== "production";
  *
  * `'unsafe-inline'` appears in script-src because the App Router inlines the
  * RSC payload into the HTML, and a policy without a per-request nonce blocks
- * hydration outright. The real gain here is not that inline — it is
+ * hydration outright. The real gain here is not that inline, it is
  * `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, and a
  * `default-src` of `'self'`, none of which were set before. Together they mean
  * an injected <script> still cannot phone home to an attacker's origin, cannot
@@ -27,7 +27,7 @@ const isDev = process.env.NODE_ENV !== "production";
  * form to somewhere else.
  *
  * res.cloudinary.com is in img-src because question images are rendered with a
- * plain <img> pointing at the upload URL — deliberately not next/image, so
+ * plain <img> pointing at the upload URL, deliberately not next/image, so
  * there is no optimizer host to allow.
  */
 const csp = [

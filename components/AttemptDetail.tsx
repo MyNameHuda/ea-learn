@@ -108,7 +108,7 @@ export function AttemptDetail({
 
   // Essay yang belum ada penilaian orang tua. Total di atas memakai skor
   // otomatis untuk essay itu, jadi total itu belum final dan harus disebut
-  // begitu — kalau tidak, orang tua mengira penilaiannya sudah selesai.
+  // begitu, kalau tidak, orang tua mengira penilaiannya sudah selesai.
   const unreviewedEssays = answers.filter(
     (a) => a.type === "essay" && !reviewedIds.has(a.id),
   ).length;
@@ -331,7 +331,7 @@ export function AttemptDetail({
                         })();
                         const isGot = got.includes(i);
                         const isCorrectAns = a.correct_answer?.includes(i);
-                        // Was `var(--success-bg)` / `var(--danger-bg)` — neither
+                        // Was `var(--success-bg)` / `var(--danger-bg)`, neither
                         // token has ever existed in globals.css, so both resolved
                         // to transparent and the correct/wrong colour coding on
                         // the options never actually painted. These are the real

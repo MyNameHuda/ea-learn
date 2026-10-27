@@ -1,10 +1,10 @@
 /**
- * Icon — simple SVG icon system (no external deps).
+ * Icon: simple SVG icon system (no external deps).
  * Add new icons here as needed.
  *
  * `style` is deliberately NOT in IconProps. Every icon destructures only
  * `{ size, className }` and forwards nothing else to the <svg>, so a `style`
- * prop would type-check and then be silently dropped on the floor — that is
+ * prop would type-check and then be silently dropped on the floor, that is
  * exactly how the "back" arrow on /profile ended up pointing forwards when
  * someone tried to rotate an IconArrowRight instead of using IconArrowLeft.
  * Leaving it out turns that silent failure into a compile error.
@@ -118,7 +118,7 @@ export function IconX({ size, className }: IconProps) {
 }
 
 /** Delete/remove. Distinct from IconX so "hapus" never shares its glyph with
- *  "tutup" — the quiz delete action in QuizActions.tsx needs to read as
+ *  "tutup", the quiz delete action in QuizActions.tsx needs to read as
  *  destructive at a glance. */
 export function IconTrash({ size, className }: IconProps) {
   return (
@@ -231,7 +231,7 @@ export function IconChild({ size, className }: IconProps) {
 }
 
 /* --------------------------------------------------------------------------
-   Added in v4 — the app had ~21 files using emoji (🏠 📝 📊 👤 ✅ 🎉 …) as
+   Added in v4, the app had ~21 files using emoji (🏠 📝 📊 👤 ✅ 🎉 …) as
    UI icons while this hand-rolled set sat nearly unused. Emoji render at a
    different size, weight and colour on every OS and cannot inherit
    currentColor, so they clashed with the palette; these can.

@@ -1,4 +1,4 @@
-// POST /api/play/start — Start an attempt (child enters name)
+// POST /api/play/start: Start an attempt (child enters name)
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getQuizByShareUuid } from "@/lib/queries/data";
@@ -12,7 +12,7 @@ const schema = z.object({
 
 export async function POST(req: Request) {
   try {
-    // No account, no session, no secret beyond the link itself — so this is the
+    // No account, no session, no secret beyond the link itself, so this is the
     // cheapest endpoint on the site to hammer. A script that reloads the page
     // with a fresh name fills the parent's results list with junk attempts.
     const budget = await hit(

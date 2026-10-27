@@ -7,8 +7,8 @@
  * This screen has been through two shapes. It was a password form while
  * sign-in was email + password; it briefly became an "Akun Google" screen when
  * sign-in moved to OAuth; it is back to a password form now. What survived both
- * round trips is the honest bit: the account's email, and — because there is
- * no self-serve recovery — an explicit way to reach a human.
+ * round trips is the honest bit: the account's email, and, because there is
+ * no self-serve recovery, an explicit way to reach a human.
  */
 import type { UserRow } from "@/lib/queries";
 import { SettingsShell } from "@/components/SettingsShell";

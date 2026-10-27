@@ -14,7 +14,7 @@ type QuestionData = {
   /** Optional figure. Same-origin path under /uploads/questions/. */
   imageUrl?: string | null;
   /** Whether more than one option is correct. Tells the child which mode they
-   *  are in without revealing which option — see /api/play/fetch. */
+   *  are in without revealing which option, see /api/play/fetch. */
   multiAnswer?: boolean;
 };
 
@@ -30,7 +30,7 @@ export default function PlayDoPage() {
   // The quiz uuid lives in the PATH (`/play/<uuid>/do`), not the query string.
   // This used to be read as `searchParams.get("uuid")`, which is always null
   // here, so `uuid` was "" and every navigation built `/play//do?...` or
-  // `/play//done?...` — a 404 the moment a kid tapped "Lanjut", and again on
+  // `/play//done?...`, a 404 the moment a kid tapped "Lanjut", and again on
   // the final submit. `useParams()` is the client-side equivalent of the
   // `params` prop the server components get.
   const params = useParams<{ uuid: string }>();
@@ -241,8 +241,8 @@ export default function PlayDoPage() {
 
           {/* The options below are multi-select, but the badge above says
               "PILIHAN GANDA", which in Indonesian school usage means one
-              answer. A child who taps a second option gets zero — grading
-              requires an exact match — and nothing on screen explains it. So
+              answer. A child who taps a second option gets zero, grading
+              requires an exact match, and nothing on screen explains it. So
               the mode is stated, in words, right above the options. */}
           {question.type === "multiple_choice" && (
             <p

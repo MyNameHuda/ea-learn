@@ -11,7 +11,7 @@
  *
  * Test ini sengaja tanpa browser: yang diuji adalah isi HTML yang benar-benar
  * dikirim ke anak, dan itu bisa diambil dengan HTTP biasa. Halaman hasil juga
- * tidak butuh login — anak tidak punya akun.
+ * tidak butuh login, anak tidak punya akun.
  *
  * Run: npm run test:ringkasan   (server lokal harus jalan di :3000)
  *      BASE_URL=https://ea-learn.vercel.app npm run test:ringkasan
@@ -282,5 +282,5 @@ console.log("\n=== 6. bersihkan ===");
   await db.query("delete from rate_limits where key like $1", ["play:ip:%"]);
 }
 await db.end();
-console.log(`\n=== ${fail === 0 ? "SEMUA LOLOS" : fail + " GAGAL"} — ${pass} pass, ${fail} fail ===`);
+console.log(`\n=== ${fail === 0 ? "SEMUA LOLOS" : fail + " GAGAL"}: ${pass} pass, ${fail} fail ===`);
 process.exit(fail === 0 ? 0 : 1);

@@ -1,8 +1,8 @@
 /**
  * Cloudinary upload, signed from the server.
  *
- * Why signed rather than an unsigned upload preset: a preset name is public —
- * it ships to the browser with the page — and anyone who opens devtools could
+ * Why signed rather than an unsigned upload preset: a preset name is public,
+ * it ships to the browser with the page, and anyone who opens devtools could
  * post arbitrary files into the account and fill the storage quota. A signed
  * upload keeps the secret on this server, so the only thing that can upload is
  * this route, behind an authenticated session.
@@ -25,7 +25,7 @@ export async function uploadToCloudinary(
   });
 
   // upload_stream is used rather than upload() because the image is already in
-  // memory as a Buffer — sending it through the form-data path would base64 it
+  // memory as a Buffer, sending it through the form-data path would base64 it
   // and inflate the payload for no reason.
   const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(

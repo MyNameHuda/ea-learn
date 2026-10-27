@@ -60,7 +60,7 @@ self.addEventListener("fetch", (event) => {
       .catch(async () => {
         const cached = await caches.match(event.request);
         if (cached) return cached;
-        // Offline fallback for navigations only — see above.
+        // Offline fallback for navigations only, see above.
         if (event.request.mode === "navigate") {
           const shell = await caches.match("/");
           if (shell) return shell;

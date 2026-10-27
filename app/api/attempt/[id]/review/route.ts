@@ -1,4 +1,4 @@
-// POST /api/attempt/[id]/review — Parent essay review
+// POST /api/attempt/[id]/review: Parent essay review
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/lib/auth";

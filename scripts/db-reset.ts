@@ -1,4 +1,4 @@
-// Reset script — truncate every table, recreate the schema, then reseed.
+// Reset script: truncate every table, recreate the schema, then reseed.
 // Run: npm run db:reset
 //
 // Rewritten for PostgreSQL, and rewritten in .ts because it now imports the

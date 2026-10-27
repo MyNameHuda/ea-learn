@@ -5,11 +5,11 @@ import { auth } from "@/lib/auth";
 import { getUserById, updateUserPassword } from "@/lib/queries/data";
 
 /**
- * POST /api/account/password — change your own password.
+ * POST /api/account/password: change your own password.
  *
  * Distinct from account recovery: this proves you know the current password,
  * whereas recovery ("lupa password") has no such proof and is handled by a
- * human — see components/ContactSupport. There is no self-serve reset link.
+ * human, see components/ContactSupport. There is no self-serve reset link.
  *
  * The current password is required even though the caller is already signed in.
  * That is deliberate: it stops someone who briefly borrows an unlocked device
@@ -122,7 +122,7 @@ export async function POST(req: Request) {
 
   // Invalidates every session, including this request's own. The caller will
   // be bounced to the login screen and has to sign in again with the new
-  // password — which is the point.
+  // password, which is the point.
   await bumpTokenVersion(user.id);
 
   return NextResponse.json({ ok: true, reauth: true });

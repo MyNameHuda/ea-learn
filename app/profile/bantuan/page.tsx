@@ -11,11 +11,11 @@ const FAQ = [
   },
   {
     q: "Bagaimana anak saya mengerjakan kuisnya?",
-    a: "Buka halaman Share Link, tekan “Bagikan ke anak”, lalu kirim link-nya lewat WhatsApp, Telegram, atau email. Anak cukup membuka link itu — tidak perlu bikin akun dan tidak perlu install apa-apa.",
+    a: "Buka halaman Share Link, tekan “Bagikan ke anak”, lalu kirim link-nya lewat WhatsApp, Telegram, atau email. Anak cukup membuka link itu, tidak perlu bikin akun dan tidak perlu install apa-apa.",
   },
   {
     q: "Kenapa halaman hasil saya kosong?",
-    a: "Hasil baru muncul setelah anak benar-benar menekan tombol Submit. Kalau masih kosong, cek halaman Notifikasi — kanal “Saat anak selesai kuis” bisa dimatikan, dan kuis yang masih berstatus Draft belum bisa dikerjakan sama sekali.",
+    a: "Hasil baru muncul setelah anak benar-benar menekan tombol Submit. Kalau masih kosong, cek halaman Notifikasi, kanal “Saat anak selesai kuis” bisa dimatikan, dan kuis yang masih berstatus Draft belum bisa dikerjakan sama sekali.",
   },
   {
     q: "Apa itu “Kesulitan per Soal”?",
@@ -23,11 +23,11 @@ const FAQ = [
   },
   {
     q: "Kenapa skor essay tidak langsung final?",
-    a: "Jawaban essay dinilai dengan mencocokkan kata kunci, jadi hasilnya hanya saran. Buka detail attempt, geser slider skor, lalu simpan — skor total langsung ikut berubah.",
+    a: "Jawaban essay dinilai dengan mencocokkan kata kunci, jadi hasilnya hanya saran. Buka detail attempt, geser slider skor, lalu simpan, skor total langsung ikut berubah.",
   },
   {
     q: "Saya lupa password, bagaimana?",
-    a: "Belum ada fitur reset otomatis, jadi reset dilakukan manual oleh developer. Hubungi kami lewat email atau WhatsApp — keduanya ada di halaman Masuk dan di halaman Bantuan ini. Sebutkan email akun kamu, nanti passwordnya kami atur ulang.",
+    a: "Belum ada fitur reset otomatis, jadi reset dilakukan manual oleh developer. Hubungi kami lewat email atau WhatsApp, keduanya ada di halaman Masuk dan di halaman Bantuan ini. Sebutkan email akun kamu, nanti passwordnya kami atur ulang.",
   },
   {
     q: "Kalau mau hapus kuis, datanya ikut hilang?",

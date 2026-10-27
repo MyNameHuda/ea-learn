@@ -206,7 +206,7 @@ export default async function QuizDetailPage({
               color="var(--accent-dark)"
               bg="var(--accent-soft)"
             />
-            {/* Two of these four cards used to point at /quiz/<id> — the page
+            {/* Two of these four cards used to point at /quiz/<id>, the page
                 they sit on. "Edit / Ubah detail" in particular looked like it
                 opened the editor and did nothing at all, which is the worst
                 kind of dead link: the one you reach for when you want to change
@@ -241,7 +241,7 @@ export default async function QuizDetailPage({
                   Attempt terakhir
                 </h3>
                 {/* This section only ever renders attempts[0], so with 2+ attempts
-                    the page looked like the others didn't exist — the stat card
+                    the page looked like the others didn't exist, the stat card
                     right above says "2 Attempt" and then one row appears. Say how
                     many there are and where the rest live. */}
                 {attempts.length > 1 && (

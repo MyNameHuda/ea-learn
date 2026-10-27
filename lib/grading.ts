@@ -75,7 +75,7 @@ function gradeMultipleChoiceAnswer(
 
 /**
  * Auto-grade an entire attempt. Updates all answers + total score in DB.
- * Essay scores are "suggested" — they need parent review to be finalized.
+ * Essay scores are "suggested", they need parent review to be finalized.
  */
 export async function autoGradeAttempt(
   attemptId: string,
@@ -122,7 +122,7 @@ export async function autoGradeAttempt(
       const weights = q.keywordWeights ?? [];
       const score = gradeEssayAnswer(ans.response, keywords, weights, q.points);
       await setAnswerAutoScore(ans.id, score);
-      // Don't add to total yet — essay needs parent review to be finalized
+      // Don't add to total yet, essay needs parent review to be finalized
       essayAutoScore += score;
       essayPendingCount++;
     }
@@ -238,13 +238,13 @@ function describeGiven(row: ChildAnswerRow): string | null {
  *
  * Yang SENGAJA tidak ditampilkan: jawaban yang benar. Kalau jawaban anak
  * salah, halaman ini hanya mengatakan nomornya salah. Kuncinya sendiri tidak
- * pernah masuk ke jalur ini — getAttemptSummaryForChild() tidak mengambil
- * kolom correct_answer dari database — jadi tidak ada yang bisa bocor karena
+ * pernah masuk ke jalur ini, getAttemptSummaryForChild() tidak mengambil
+ * kolom correct_answer dari database, jadi tidak ada yang bisa bocor karena
  * "lupa dihapus" di suatu tempat.
  *
  * Status per soal:
  *   - PG dinilai lenient: benar kalau dapat poin penuh, salah kalau nol.
- *   - Essay belum direview orang tua: "menunggu review", bukan "salah" —
+ *   - Essay belum direview orang tua: "menunggu review", bukan "salah",
  *     belum ada yang menilai, jadi menyebutnya salah akan bohong.
  *   - Essay sudah direview: benar / sebagian benar / salah sesuai nilainya,
  *     karena essay punya skor parsial dan tidak bisa disebut benar-salah.

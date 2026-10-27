@@ -1,4 +1,4 @@
-// POST /api/quiz/[id]/question — Add question to quiz
+// POST /api/quiz/[id]/question: Add question to quiz
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { questionSchema, fieldErrorsOf } from "@/lib/question-schema";
@@ -19,8 +19,8 @@ import {
  * `options.min(1)`, so every "Tambah soal" click came back 400 and the
  * feature could never be used at all.
  *
- * Completeness is enforced where it actually matters — at publish time,
- * see /api/quiz/[id]/publish — so an unfinished question can exist in a
+ * Completeness is enforced where it actually matters, at publish time,
+ * see /api/quiz/[id]/publish, so an unfinished question can exist in a
  * draft but can never reach a child.
  *
  * The schemas now live in lib/question-schema.ts so this route and the PATCH

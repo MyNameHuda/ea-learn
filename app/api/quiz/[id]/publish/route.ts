@@ -1,4 +1,4 @@
-// POST /api/quiz/[id]/publish — Publish/unpublish quiz
+// POST /api/quiz/[id]/publish: Publish/unpublish quiz
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import {

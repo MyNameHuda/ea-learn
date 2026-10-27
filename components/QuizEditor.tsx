@@ -61,7 +61,7 @@ export function QuizEditor({
    * `questions` di bawah adalah keadaan yang ditampilkan layar, dan itu
    * diisi duluan (optimistic) sebelum server sempat menjawab. Kalau PATCH-nya
    * ditolak, isi di layar akan berbeda dari isi di database, dan pemakai
-   * akan me-reload lalu menemukan soalnya kosong — persis yang terjadi pada
+   * akan me-reload lalu menemukan soalnya kosong, persis yang terjadi pada
    * 40 soal "UH 2". Peta ini menjadi sumber kebenaran untuk apa yang sudah
    * benar-benar tersimpan, sehingga kegagalan bisa dikembalikan, bukan
    * diam-diam membiarkan layar menipu. */
@@ -75,7 +75,7 @@ export function QuizEditor({
   /* Declared before the effect that calls it. Function declarations are
      hoisted so this used to run fine, but relying on that hides the fact that
      the auto-save effect depends on a value that did not exist yet at the
-     point of use — move it up so the dependency is plain to read. */
+     point of use, move it up so the dependency is plain to read. */
   async function saveMeta() {
     try {
       await fetch(`/api/quiz/${quiz.id}/update`, {
@@ -89,7 +89,7 @@ export function QuizEditor({
         }),
       });
     } catch {
-      // Silent — auto-save retries next time
+      // Silent, auto-save retries next time
     }
   }
 
@@ -152,10 +152,10 @@ export function QuizEditor({
       // `updated`, so every field has to be listed here or it silently never
       // reaches the server. imageUrl was missing from that list: the upload
       // succeeded, the editor showed a preview and said "Gambar ditambahkan",
-      // and image_url stayed NULL in the database — so the child opened the
+      // and image_url stayed NULL in the database, so the child opened the
       // published quiz and saw a question with nothing to look at.
       //
-      // `?? null` rather than `|| null` only for readability — mapQuestion
+      // `?? null` rather than `|| null` only for readability, mapQuestion
       // always produces string | null, so both are equivalent. null is the
       // value that clears the column, which is what clicking "Hapus" must do.
       imageUrl: updated.imageUrl ?? null,
@@ -180,7 +180,7 @@ export function QuizEditor({
      * Pemanggilan ini dulu membuang responsnya, dan `await fetch` tidak
      * melempar error untuk status 4xx. Jadi server bisa menolak seluruh
      * penyimpanan dengan 400, editor tetap menampilkan teksnya, dan orang
-     * tua mengira sedang mengetik dengan aman — lalu menemukan semua soalnya
+     * tua mengira sedang mengetik dengan aman, lalu menemukan semua soalnya
      * kosong saat me-reload.
      *
      * Sekarang kegagalan dibalas: toast muncul, dan isi soal dikembalikan
@@ -307,7 +307,7 @@ export function QuizEditor({
               <div className="form-group">
                 <label htmlFor="subject">Mapel</label>
                 {/* Was a <select> of seven fixed options, ending in
-                    "Lainnya" — which stored the literal string "Lainnya" and
+                    "Lainnya", which stored the literal string "Lainnya" and
                     threw away whatever the parent actually meant. Free text
                     now, matching /quiz/new. */}
                 <input
@@ -615,7 +615,7 @@ function QuestionEditor({
               the answer to match the key exactly.
 
               The key is still stored as a JSON array, and grading still
-              compares arrays — only the authoring control is now single-select,
+              compares arrays, only the authoring control is now single-select,
               so a question can never be saved in the state that is unwinnable.
               Every existing question in the database already had exactly one
               correct answer, so nothing was representable before that is not
