@@ -65,6 +65,21 @@ export function AttemptDetail({
   );
   const [saving, startSave] = useTransition();
   const [totalScore, setTotalScore] = useState(attempt.total_score);
+  // Which essays the parent has actually ruled on.
+  //
+  // Before, the page could not tell "the machine scored this" apart from "I
+  // scored this": the slider started on the auto score and looked like a real
+  // assessment. The child's summary page says "Menunggu review" for these, so
+  // this page has to say the same thing, otherwise the parent sees a filled-in
+  // number where the child was told there is nothing yet.
+  const [reviewedIds, setReviewedIds] = useState<Set<string>>(
+    () =>
+      new Set(
+        answers
+          .filter((a) => a.final_score !== null && a.final_score !== undefined)
+          .map((a) => a.id),
+      ),
+  );
 
   async function saveReview(answerId: string) {
     startSave(async () => {
@@ -84,14 +99,21 @@ export function AttemptDetail({
           "success",
         );
         setTotalScore(data.totalScore);
+        setReviewedIds((prev) => new Set(prev).add(answerId));
       } else {
         showToast(data.error || "Gagal", "error");
       }
     });
   }
 
-  const isCorrectMC = (a: AttemptAnswer): boolean | null => {
-    if (a.type !== "multiple_choice" || !a.correct_answer) return null;
+  // Essay yang belum ada penilaian orang tua. Total di atas memakai skor
+  // otomatis untuk essay itu, jadi total itu belum final dan harus disebut
+  // begitu — kalau tidak, orang tua mengira penilaiannya sudah selesai.
+  const unreviewedEssays = answers.filter(
+    (a) => a.type === "essay" && !reviewedIds.has(a.id),
+  ).length;
+
+  const isCorrectMC = (a: AttemptAnswer): boolean | null => {    if (a.type !== "multiple_choice" || !a.correct_answer) return null;
     try {
       const got = JSON.parse(a.response || "[]") as number[];
       const want = a.correct_answer;
@@ -148,7 +170,12 @@ export function AttemptDetail({
                 /{attempt.max_score}
               </span>
             </div>
-            <div className="t-muted">Total poin (setelah review)</div>
+            <div className="t-muted">
+              Total poin
+              {unreviewedEssays > 0
+                ? ` · ${unreviewedEssays} essay belum dinilai`
+                : ""}
+            </div>
           </div>
 
           <h3 className="h-section" style={{ marginBottom: 12 }}>
@@ -210,6 +237,16 @@ export function AttemptDetail({
                     >
                       {mcCorrect ? <IconCheck size={12} /> : <IconX size={12} />}
                       {mcCorrect ? "Benar" : "Salah"} · {a.points}p
+                    </span>
+                  )}
+                  {a.type === "essay" && (
+                    <span
+                      className={`t-tag ${
+                        reviewedIds.has(a.id) ? "success" : "warning"
+                      }`}
+                      style={{ marginLeft: "auto" }}
+                    >
+                      {reviewedIds.has(a.id) ? "Sudah Dinilai" : "Belum Dinilai"}
                     </span>
                   )}
                 </div>
@@ -432,7 +469,7 @@ export function AttemptDetail({
                           justifyContent: "space-between",
                         }}
                       >
-                        <span>Override skor</span>
+                        <span>Nilai dari Bunda</span>
                         <span
                           style={{
                             color: "var(--primary-dark)",
@@ -442,6 +479,19 @@ export function AttemptDetail({
                           {finalScore}/{a.points}p
                         </span>
                       </label>
+                      {!reviewedIds.has(a.id) && (
+                        <div
+                          className="t-soft"
+                          style={{
+                            fontSize: 11,
+                            lineHeight: 1.5,
+                            marginBottom: 6,
+                          }}
+                        >
+                          Belum dinilai. Slider masih di skor otomatis, geser
+                          kalau mau mengubah.
+                        </div>
+                      )}
                       <input
                         id={`score-${a.id}`}
                         aria-label={`Nilai soal ${idx + 1}, maksimal ${a.points} poin`}

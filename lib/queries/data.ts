@@ -682,6 +682,60 @@ export async function getAnswersForAttempt(attemptId: string): Promise<AnswerRes
   );
 }
 
+/**
+ * Ringkasan jawaban untuk halaman hasil anak.
+ *
+ * Sengaja TIDAK mengambil `correct_answer` maupun `keywords`. Kunci jawaban
+ * tidak pernah dibutuhkan di sisi anak, dan dengan tidak mengambil kolom itu
+ * dari database, kebocoran tidak mungkin terjadi karena "lupa dihapus dari
+ * respons" — kolomnya memang tidak pernah ikut terbawa sama sekali.
+ *
+ * Yang dikembalikan sudah cukup untuk dua hal: menampilkan jawaban anak
+ * sendiri, dan menentukan apakah jawaban itu benar. Untuk soal PG itu berarti
+ * auto_score; untuk soal essay, nilainya belum final sampai orang tua
+ * mereview, jadi final_score yang dipakai.
+ *
+ * LEFT JOIN dari questions ke answers supaya soal yang dilewati anak tetap
+ * muncul di daftarnya, dengan jawaban null — bukan hilang dari daftar.
+ */
+export type ChildAnswerRow = {
+  questionId: string;
+  orderIndex: number;
+  type: QuestionType;
+  prompt: string;
+  options: string[] | null;
+  points: number;
+  response: string | null;
+  autoScore: number | null;
+  finalScore: number | null;
+};
+
+export async function getAttemptSummaryForChild(
+  attemptId: string,
+  quizId: string,
+): Promise<ChildAnswerRow[]> {
+  const rows = await allRows<Record<string, unknown>>(
+    `SELECT q.id AS question_id, q.order_index, q.type, q.prompt, q.options, q.points,
+            a.response, a.auto_score, a.final_score
+       FROM questions q
+       LEFT JOIN answers a ON a.question_id = q.id AND a.attempt_id = ?
+      WHERE q.quiz_id = ?
+      ORDER BY q.order_index ASC`,
+    [attemptId, quizId],
+  );
+  return rows.map((r) => ({
+    questionId: r.question_id as string,
+    orderIndex: Number(r.order_index ?? 0),
+    type: r.type as QuestionType,
+    prompt: (r.prompt as string) ?? "",
+    options: r.options ? (JSON.parse(r.options as string) as string[]) : null,
+    points: Number(r.points ?? 0),
+    response: (r.response as string | null) ?? null,
+    autoScore: r.auto_score === null || r.auto_score === undefined ? null : Number(r.auto_score),
+    finalScore: r.final_score === null || r.final_score === undefined ? null : Number(r.final_score),
+  }));
+}
+
 export async function getAnswersWithQuestionsForAttempt(
   attemptId: string,
 ): Promise<Array<{ answer: AnswerResult; question: QuestionRow }>> {
@@ -720,10 +774,21 @@ export async function getAnswersWithQuestionsForAttempt(
 }
 
 export async function setAnswerAutoScore(answerId: string, score: number) {
-  await runSql(
-    `UPDATE answers SET auto_score = ?, final_score = ? WHERE id = ?`,
-    [score, score, answerId],
-  );
+  // Only `auto_score` is written here.
+  //
+  // This used to write `final_score` as well, which made the two columns mean
+  // the same thing and quietly destroyed the distinction the whole review flow
+  // depends on: `final_score` is the PARENT's decision, `auto_score` is the
+  // machine's suggestion. Because auto-grade filled both, `final_score` was
+  // never null, so "belum dinilai" and "sudah dinilai" looked identical. A
+  // parent opening the review page saw a slider already carrying the
+  // machine's number, and saving without touching it published that number as
+  // if the parent had written it.
+  //
+  // Every reader already falls back with COALESCE(final_score, auto_score, 0),
+  // so the total is unchanged. What changes is that an unreviewed answer is
+  // finally identifiable as unreviewed.
+  await runSql(`UPDATE answers SET auto_score = ? WHERE id = ?`, [score, answerId]);
 }
 
 export async function setAnswerParentReview(

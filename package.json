@@ -13,6 +13,7 @@
         "db:test": "node --env-file=.env --import tsx scripts/db-test.ts",
         "test:soal": "node --env-file=.env --import tsx scripts/test-question-save.mts",
         "test:share": "node --env-file=.env --import tsx scripts/test-share-draft.mts",
+        "test:ringkasan": "node --env-file=.env --import tsx scripts/test-attempt-summary.mts",
         "deploy": "vercel --prod",
         "deploy:preview": "vercel"
     },
